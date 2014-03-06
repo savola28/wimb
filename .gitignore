@@ -1,2 +1,3 @@
 node_modules/*
 heroku-client/*
+npm-debug.log
