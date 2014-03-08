@@ -10,6 +10,8 @@ var app =
     
     updatingVehicles: false,
     
+    buttons: null,
+    
 	start: function ()
 	{
         try{
@@ -58,11 +60,16 @@ var app =
 
     setCurrentLocation: function (event)
     {
+        app.buttons.location.button('loading');
+        
         var currentLocationMarker = new google.maps.Marker({
-            animation: google.maps.Animation.DROP
+            animation: google.maps.Animation.DROP,
+            icon: 'http://maps.gstatic.com/intl/en_ALL/mapfiles/drag_cross_67_16.png'
         });
         
-        $(event.target).attr('disable', true);
+        var infoWindow = new google.maps.InfoWindow({
+            content: 'Me'
+        });
         
         navigator.geolocation.getCurrentPosition(
             function (pos){
@@ -70,9 +77,10 @@ var app =
                 app.map.setCenter(latLng);
                 currentLocationMarker.setMap(app.map);
                 currentLocationMarker.setPosition(latLng);
+                infoWindow.open(app.map, currentLocationMarker);
                 setTimeout(function() {
                     currentLocationMarker.setMap(null);
-                    $(event.target).removeAttr('disable');
+                    app.buttons.location.button('reset');
                 }, 1500);
             },
             function error(err) {
@@ -101,20 +109,31 @@ var app =
         
         this.initControls();
         
+        this.buttons.busses.addClass('btn-success').button('loading');
+        
         io.connect().on('vehicleUpdate', this.updateVehicles.bind(this));
     },
     
     initControls: function ()
     {
         var controls = $('<div class="btn-group-vertical"></div>');
-        $('<button class="btn btn-default btn-success">Busses</button>').click(app.toggleBusses).appendTo(controls);
-        $('<button class="btn btn-default">Stops</button>').click(app.toggleStops).appendTo(controls);
-		$('<button class="btn btn-default"><i class="glyphicon glyphicon-globe"></i>&nbsp;My location</button>').click(app.setCurrentLocation).appendTo(controls);
+        this.buttons = {
+            busses: this.getControl(app.toggleBusses, 'Busses').appendTo(controls),
+            stops: this.getControl(app.toggleStops, 'Stops').appendTo(controls),
+            location: this.getControl(app.setCurrentLocation, 'Me').appendTo(controls)
+        };
         this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controls[0]);        
+    },
+    
+    getControl: function (clickHandler, text)
+    {
+        return $('<button class="btn btn-default" data-loading-text="Loading...">'+text+'</button>').click(clickHandler);
     },
     
     updateVehicles: function (data)
     {
+        this.buttons.busses.button('reset');
+        
         if ( (this.showVehicles === false) || (this.updatingVehicles === true)){
             return;
         }
@@ -173,8 +192,15 @@ var app =
     showBusDetails: function()
     {
         if (!this.infoWindow){
+            
+            var content = 'At the terminus';
+            
+            if (this.origin !== '' && this.destination !== ''){
+                content = this.origin + ' &rarr; ' + this.destination;
+            }
+            
             this.infoWindow = new google.maps.InfoWindow({
-                content: this.origin + ' &rarr; ' + this.destination
+                content: content
             });
         }
         this.infoWindow.open(this.map, this);
@@ -188,6 +214,7 @@ var app =
             app.setVehicles({});
         }
         else{
+            app.buttons.busses.button('loading');
             app.showVehicles = true;
         }
     },
