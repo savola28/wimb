@@ -12,8 +12,13 @@ server.listen(process.env.PORT);
 
 var io = io.listen(server);
 
+var fetchingData = false;
+
 var getSIRIData = function ()
 {
+    if (fetchingData === true){
+        return;
+    }
     http.get(
         "http://data.itsfactory.fi/siriaccess/vm/json",
         broadcastSIRIData
@@ -32,6 +37,7 @@ var broadcastSIRIData = function (res)
 
         res.on('end', function() {
             io.sockets.emit('vehicleUpdate', JSON.parse(siriData));
+            fetchingData = false;
         });
 };
 
