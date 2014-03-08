@@ -10,8 +10,6 @@ var app =
     
     updatingVehicles: false,
     
-    currentLocationMarker: null,
-    
 	start: function ()
 	{
         try{
@@ -58,30 +56,27 @@ var app =
         );
     },
 
-    setCurrentLocation: function (button)
+    setCurrentLocation: function (event)
     {
-        if (!this.currentLocationMarker){
-            this.currentLocationMarker = new google.maps.Marker({
-                animation: google.maps.Animation.DROP,
-                icon: 'http://maps.google.com/mapfiles/marker_yellow.png'
-            });
-        }
+        var currentLocationMarker = new google.maps.Marker({
+            animation: google.maps.Animation.DROP
+        });
         
-        button.disabled = 'disable';
+        $(event.target).attr('disable', true);
         
         navigator.geolocation.getCurrentPosition(
             function (pos){
-                button.disabled = '';
-                var latLng = this.coordsToLatLng(pos.coords);
-                this.map.setCenter(latLng);
-                this.currentLocationMarker.setMap(this.map);
-                this.currentLocationMarker.setPosition(latLng);
-            }.bind(this),
+                var latLng = app.coordsToLatLng(pos.coords);
+                app.map.setCenter(latLng);
+                currentLocationMarker.setMap(app.map);
+                currentLocationMarker.setPosition(latLng);
+                setTimeout(function() {
+                    currentLocationMarker.setMap(null);
+                    $(event.target).removeAttr('disable');
+                }, 1500);
+            },
             function error(err) {
                 throw err;
-            },
-            {
-                maximumAge: 0 // don't use cached position
             }
         );
     },
@@ -111,13 +106,11 @@ var app =
     
     initControls: function ()
     {
-        var controls = document.createElement('div');
-        controls.className = 'btn-group-vertical';
-        controls.style.padding = '5px';
-		controls.innerHTML += '<button onclick="app.toggleBusses(this);" class="btn btn-default btn-success">Busses</button>';
-		controls.innerHTML += '<button onclick="app.toggleStops(this);" class="btn btn-default">Stops</button>';
-		controls.innerHTML += '<button onclick="app.setCurrentLocation(this);" class="btn btn-default"><i class="glyphicon glyphicon-globe"></i>&nbsp;My location</button>';
-        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controls);        
+        var controls = $('<div class="btn-group-vertical"></div>');
+        $('<button class="btn btn-default btn-success">Busses</button>').click(app.toggleBusses).appendTo(controls);
+        $('<button class="btn btn-default">Stops</button>').click(app.toggleStops).appendTo(controls);
+		$('<button class="btn btn-default"><i class="glyphicon glyphicon-globe"></i>&nbsp;My location</button>').click(app.setCurrentLocation).appendTo(controls);
+        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controls[0]);        
     },
     
     updateVehicles: function (data)
@@ -128,18 +121,29 @@ var app =
         
         this.updatingVehicles = true;
         
-        var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
-        var newVehicles = {};
+        var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity,
+            newVehicles = {},
+            bounds = this.map.getBounds();
         
         for(var i = 0; i < vehicles.length; i++)
         {
             var vehicleId = vehicles[i].MonitoredVehicleJourney.VehicleRef.value,
                 coords = vehicles[i].MonitoredVehicleJourney.VehicleLocation,
-                latLng = this.coordsToLatLng(coords);
-                
-            if (this.vehicles[vehicleId]){
+                latLng = this.coordsToLatLng(coords),
+                origin = vehicles[i].MonitoredVehicleJourney.OriginName.value,
+                destination = vehicles[i].MonitoredVehicleJourney.DestinationName.value;
+            
+            if (bounds.contains(latLng) === false){
+                if (this.vehicles[vehicleId]){
+                    this.vehicles[vehicleId].marker.setMap(null);
+                    delete this.vehicles[vehicleId];
+                }
+            }    
+            else if (this.vehicles[vehicleId]){
                 var vehicle = this.vehicles[vehicleId];
                 vehicle.marker.setPosition(latLng);
+                vehicle.marker.origin = origin;
+                vehicle.marker.destination = destination;
                 newVehicles[vehicleId] = vehicle;
                 delete this.vehicles[vehicleId];
             }
@@ -151,8 +155,8 @@ var app =
                     labelAnchor: new google.maps.Point(6, 35),
                     labelClass: 'bus-markers',
                     labelInBackground: false,
-                    origin: vehicles[i].MonitoredVehicleJourney.OriginName.value,
-                    destination: vehicles[i].MonitoredVehicleJourney.DestinationName.value
+                    origin: origin,
+                    destination: destination
                 });
                 
                 google.maps.event.addListener(marker, 'click', this.showBusDetails);
@@ -176,23 +180,22 @@ var app =
         this.infoWindow.open(this.map, this);
     },
     
-    toggleBusses: function (button)
+    toggleBusses: function (event)
     {
+        $(event.target).toggleClass('btn-success');
         if (app.showVehicles === true){
             app.showVehicles = false;
-            button.className = 'btn btn-default';
             app.setVehicles({});
         }
         else{
             app.showVehicles = true;
-            button.className = 'btn btn-default btn-success';
         }
     },
     
-    toggleStops: function (button)
+    toggleStops: function (event)
     {
         alert('Stops are under construction');
-        button.disabled = 'disabled';
+        $(event.target).attr("disabled", true);
     },
     
     setVehicles: function (vehicles)
