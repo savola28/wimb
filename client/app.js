@@ -1,3 +1,5 @@
+BusMarker.prototype = new google.maps.OverlayView();
+
 var app = 
 {
     map: null,
@@ -61,6 +63,8 @@ var app =
     {
         this.buttons.location.removeClass('disabled');
         
+        var latLng = app.coordsToLatLng(position.coords);
+        
         if (!this.positionMarker){
             this.positionMarker = new google.maps.Marker({
                 icon: {
@@ -79,7 +83,6 @@ var app =
             });
         }
         
-        var latLng = app.coordsToLatLng(position.coords);
         this.positionMarker.setPosition(latLng);
     },
     
@@ -151,7 +154,8 @@ var app =
                 coords = vehicles[i].MonitoredVehicleJourney.VehicleLocation,
                 latLng = this.coordsToLatLng(coords),
                 origin = vehicles[i].MonitoredVehicleJourney.OriginName.value,
-                destination = vehicles[i].MonitoredVehicleJourney.DestinationName.value;
+                destination = vehicles[i].MonitoredVehicleJourney.DestinationName.value,
+                route = {origin: origin, destination: destination};
             
             if (bounds.contains(latLng) === false){
                 continue;
@@ -161,22 +165,18 @@ var app =
             
             if (this.vehicles[vehicleId]){
                 marker = this.vehicles[vehicleId];
+                marker.setPosition(latLng);
+                marker.setRoute(route);
                 delete this.vehicles[vehicleId];
             }
             else{
-                marker = new MarkerWithLabel({
-                    map: this.map,
-                    labelContent: vehicles[i].MonitoredVehicleJourney.LineRef.value,
-                    labelAnchor: new google.maps.Point(6, 35),
-                    labelClass: 'bus-markers',
-                    labelInBackground: false,
+                marker = new BusMarker({
+                    map: app.map,
+                    content: vehicles[i].MonitoredVehicleJourney.LineRef.value,
+                    position: latLng,
+                    route: route
                 });
-                google.maps.event.addListener(marker, 'click', this.showBusDetails);
             }
-            
-            marker.setPosition(latLng);
-            marker.origin = origin;
-            marker.destination = destination;
             
             newVehicles[vehicleId] = marker;
 		}
@@ -184,23 +184,6 @@ var app =
         this.setVehicles(newVehicles);
         
         this.updatingVehicles = false;
-    },
-    
-    showBusDetails: function()
-    {
-        if (!this.infoWindow){
-            
-            var content = 'At the terminus';
-            
-            if (this.origin !== '' && this.destination !== ''){
-                content = this.origin + ' &rarr; ' + this.destination;
-            }
-            
-            this.infoWindow = new google.maps.InfoWindow({
-                content: content
-            });
-        }
-        this.infoWindow.open(this.map, this);
     },
     
     toggleBusses: function (event)
@@ -233,4 +216,70 @@ var app =
 
         this.vehicles = vehicles;
     }
+};
+
+function BusMarker(args) {
+    this._map = args.map;
+    this._content = args.content;
+    this._position = args.position;
+    this._route = args.route;
+    this._element = null;
+    
+    // Explicitly call setMap on this overlay.
+    this.setMap(this._map);
+}
+
+BusMarker.prototype.onAdd = function() {
+    this._element = $('<div class="bus-marker">'+this._content+'</div>');
+    
+    // Add the element to the "overlayLayer" pane.
+    var panes = this.getPanes();
+    panes.overlayMouseTarget.appendChild(this._element[0]);
+};
+
+BusMarker.prototype.draw = function() {
+    this.setPosition(this._position);
+    this.setRoute(this._route);
+};
+
+// The onRemove() method will be called automatically from the API if
+// we ever set the overlay's map property to 'null'.
+BusMarker.prototype.onRemove = function() {
+    this._element.remove();
+    this._element = null;
+};
+
+BusMarker.prototype.setPosition = function(position) {
+    this._position = position;
+    var overlayProjection = this.getProjection();
+    var pixelPosition = overlayProjection.fromLatLngToDivPixel(position),
+        left = (pixelPosition.x - 12.5) + 'px',
+        top = (pixelPosition.y - 10) + 'px';
+        
+    this._element.css('left', left).css('top', top);
+};
+
+BusMarker.prototype.setRoute = function(route) {
+    this._route= route;
+    this._element.tooltip({
+        trigger: 'click',
+        container: this._element,
+        html: true,
+        title: this._routeToHTML()
+    });
+};
+
+BusMarker.prototype._routeToHTML = function() {
+    var routeArray = [];
+            
+    if (this._route.origin !== '' && this._route.destination !== ''){
+        routeArray.push(this._route.origin);
+        routeArray.push('&rarr;');
+        routeArray.push(this._route.destination);
+    }
+    else{
+        routeArray.push('At the terminus');
+    }
+    
+    return '<div style="white-space: nowrap">' + routeArray.join('&nbsp;') + '</div>';
 };
