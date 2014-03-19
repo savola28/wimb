@@ -15,9 +15,9 @@ body {
 .bus-marker {
     border-style: solid;
     border-width: 1px;
-    color: white;
-    background-color: rgb(251, 112, 100);
-    font-size: 11px;
+    color: #FFFFFF;
+    background-color: #000000;
+    font-size: 12px;
     text-align: center;
     width: 25px;
     height: 20px;

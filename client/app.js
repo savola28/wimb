@@ -66,13 +66,7 @@ var app =
         var latLng = app.coordsToLatLng(position.coords);
         
         if (!this.positionMarker){
-            this.positionMarker = new google.maps.Marker({
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 5
-                },
-                map: app.map
-            });
+            this.positionMarker = new google.maps.Marker({map: app.map});
             
             this.positionMarker.infoWindow = new google.maps.InfoWindow({
                 content: 'Me'
