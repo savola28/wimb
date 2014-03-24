@@ -52,8 +52,7 @@ var app =
         
         var geo_options = {
             enableHighAccuracy: false, 
-            maximumAge        : 30000, 
-            timeout           : 27000
+            maximumAge        : 0
         };
         
         navigator.geolocation.watchPosition(this.updatePosition.bind(this), geo_error, geo_options);
