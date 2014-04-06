@@ -112,6 +112,8 @@ var app =
         
         io.connect().on('vehicleUpdate', this.updateVehicles.bind(this));
         
+        google.maps.event.addListener(this.map, 'bounds_changed', this.updateStops.bind(this));
+        
         this.watchPosition();
     },
     
@@ -208,6 +210,11 @@ var app =
         }
 
         this.vehicles = vehicles;
+    },
+    
+    updateStops: function ()
+    {
+        console.log(this.map.getBounds());
     }
 };
 
