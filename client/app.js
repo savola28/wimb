@@ -153,6 +153,9 @@ var app =
                 route = {origin: origin, destination: destination};
             
             if (bounds.contains(latLng) === false){
+                if (this.vehicles[vehicleId]){
+                    this.removeVehicle(vehicleId);
+                }
                 continue;
             }
             
@@ -210,6 +213,12 @@ var app =
         }
 
         this.vehicles = vehicles;
+    },
+    
+    removeVehicle: function (id)
+    {
+        this.vehicles[id].setMap(null); // clear vehicle marker from the map
+        delete this.vehicles[id];
     },
     
     updateStops: function ()
