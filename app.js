@@ -6,7 +6,32 @@ var app = express();
 
 app.use(express.static('./client'));
 
-var server = require('http').createServer(app);
+app.get('/stops/:bbox', function(req, res)
+{
+    var options = {
+        hostname: 'api.publictransport.tampere.fi',
+        path: '/prod/?limit=20&epsg_in=wgs84&epsg_out=wgs84&request=stops_area&user=its_factory_temp&pass=ITS4devN&bbox=' + req.params.bbox
+    };
+    
+    res.set('Content-Type', 'application/json');
+    
+    http.get(options, function(stopsRes) {
+        var data = '';
+        
+        stopsRes.setEncoding('utf8');
+
+        stopsRes.on('data', function(chunk){
+            data += chunk;
+        });
+        
+        stopsRes.on('end', function(){
+            res.write(data);
+            res.end();
+        });
+    });
+});
+
+var server = http.createServer(app);
 
 server.listen(process.env.PORT);
 

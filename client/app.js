@@ -4,6 +4,8 @@ var app =
     
     vehicles: {},
     
+    stops: {},
+    
     showVehicles: true,
     
     updatingVehicles: false,
@@ -110,7 +112,7 @@ var app =
         
         io.connect().on('vehicleUpdate', this.updateVehicles.bind(this));
         
-        google.maps.event.addListener(this.map, 'bounds_changed', this.updateStops.bind(this));
+        google.maps.event.addListener(this.map, 'bounds_changed', this.fetchStops.bind(this));
         
         this.watchPosition();
     },
@@ -219,8 +221,43 @@ var app =
         delete this.vehicles[id];
     },
     
-    updateStops: function ()
+    fetchStops: function ()
     {
-        console.log(this.map.getBounds());
+        if (this.fetchingStops){
+            return;
+        }
+        
+        this.fetchingStops = true;
+        
+        var bounds = this.map.getBounds(),
+            ne = bounds.getNorthEast(),
+            sw = bounds.getSouthWest(),
+            bbox = [sw.lng(), sw.lat(), ne.lng(), ne.lat()].join(',');
+        
+        $.getJSON('stops/'+bbox, this.updateStops.bind(this));
+    },
+    
+    updateStops: function (stops)
+    {
+        for(var i = 0; i < stops.length; i++){
+            var stop = stops[i];
+            
+            if (this.stops[stop.code]){
+                continue;
+            }
+            
+            var coords = stop.coords.split(','),
+                coords = {
+                    longitude: coords[0],
+                    latitude: coords[1]
+                };
+            
+            this.stops[stop.code] = new StopMarker({
+                map: this.map,
+                code: stop.code,
+                position: this.coordsToLatLng(coords)
+            });
+        }
+        this.fetchingStops = false;
     }
 };
