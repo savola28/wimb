@@ -61,7 +61,7 @@ var app =
     
     updatePosition: function (position)
     {
-        this.buttons.location.removeClass('disabled');
+        this.locationButton.removeClass('disabled');
         
         var latLng = app.coordsToLatLng(position.coords);
         
@@ -127,11 +127,8 @@ var app =
     
     initControls: function ()
     {
-        var controls = $('<div class="btn-group-vertical"></div>');
-        this.buttons = {
-            location: $('<button class="btn btn-default disabled">My location</button>').click(app.showPosition).appendTo(controls)
-        };
-        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controls[0]);
+        this.locationButton = $('<button class="btn btn-default disabled">My location</button>').click(this.showPosition.bind(this));
+        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this.locationButton[0]);
         
         this.loadingMessage = $('<div class="alert alert-info">Loading...</div>');
         this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.loadingMessage[0]);
