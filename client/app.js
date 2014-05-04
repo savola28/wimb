@@ -4,7 +4,7 @@ var app =
     
     vehicles: {},
     
-    stops: {},
+    stopMarkers: [],
     
     showVehicles: true,
     
@@ -16,6 +16,7 @@ var app =
 	{
         try{
             this.isCoolBrowser();
+            this.initModal();
             this.initMap();
 		}
 		catch (error){
@@ -108,6 +109,13 @@ var app =
 		
         this.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
         
+        var styles = [
+            {'featureType': 'transit', 'stylers': [{'visibility': 'off'}]},
+            {'featureType': 'poi', 'stylers': [{'visibility': 'off'}]}
+        ];
+
+        this.map.setOptions({ styles: styles });
+        
         this.initControls();
         
         io.connect().on('vehicleUpdate', this.updateVehicles.bind(this));
@@ -126,6 +134,42 @@ var app =
             location: $('<button class="btn btn-default disabled">My location</button>').click(app.showPosition).appendTo(controls)
         };
         this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controls[0]);        
+    },
+    
+    fetchStops: function ()
+    {
+        if (this.fetchingStops){
+            return;
+        }
+        
+        this.fetchingStops = true;
+        
+        if (this.map.getZoom() < 17){
+            for(var i = 0; i < this.stopMarkers.length; i++){
+                this.stopMarkers[i].setMap(null);
+            }
+            this.stopMarkers = [];
+            this.fetchingStops = false;
+            return;
+        }
+        
+        var bounds = this.map.getBounds(),
+            ne = bounds.getNorthEast(),
+            sw = bounds.getSouthWest(),
+            bbox = [sw.lng(), sw.lat(), ne.lng(), ne.lat()].join(',');
+        
+        $.getJSON('stops/'+bbox, this.updateStops.bind(this));
+    },
+    
+    updateStops: function (stops)
+    {
+        for(var i = 0; i < stops.length; i++){
+            this.stopMarkers.push(new StopMarker({
+                map: this.map,
+                stop: stops[i]
+            }));
+        }
+        this.fetchingStops = false;
     },
     
     updateVehicles: function (data)
@@ -199,52 +243,66 @@ var app =
             }
         }
 
-        this.vehicles = vehicles;
+        this.vehicles = {};
     },
     
-    removeVehicle: function (id)
+    initModal: function ()
     {
-        this.vehicles[id].setMap(null); // clear vehicle marker from the map
-        delete this.vehicles[id];
+        this.modal = $('#modal');
+        this.departures = {
+            title: $('h4', this.modal),
+            info: $('i', this.modal),
+            table: $('table', this.modal),
+            tbody: $('tbody', this.modal),
+            stopCode: ''
+        };
+
+        this.modal.modal({
+            show: false
+        });
+        
+        $('input[name=time_limit]', app.modal).on('change', this.loadDepartures.bind(this));
     },
     
-    fetchStops: function ()
+    startMonitoring: function (event)
     {
-        if (this.fetchingStops){
-            return;
+        var stop = event.data.stop;
+        this.departures.title.text(stop.code + ' ' + stop.name);
+        this.modal.modal('show');
+        this.departures.stopCode = stop.code;
+        this.loadDepartures();
+    },
+
+    loadDepartures: function ()
+    {
+        this.departures.info.removeClass('hidden');
+        this.departures.info.text('Loading...');
+        this.departures.table.addClass('hidden');
+        this.departures.tbody.empty();
+        
+        var timeLimit = $('input[name=time_limit]:checked', app.modal).val(),
+            url = ['stop', this.departures.stopCode, timeLimit];
+        
+        $.getJSON(url.join('/'), this.renderDepartures.bind(this));
+    },
+
+    renderDepartures: function (data)
+    {
+        if (data[0].departures.length === 0){
+            this.departures.info.text('No departures');
+        }
+        else{
+            this.departures.info.addClass('hidden');
+            this.departures.table.removeClass('hidden');
         }
         
-        this.fetchingStops = true;
-        
-        var bounds = this.map.getBounds(),
-            ne = bounds.getNorthEast(),
-            sw = bounds.getSouthWest(),
-            bbox = [sw.lng(), sw.lat(), ne.lng(), ne.lat()].join(',');
-        
-        $.getJSON('stops/'+bbox, this.updateStops.bind(this));
-    },
-    
-    updateStops: function (stops)
-    {
-        for(var i = 0; i < stops.length; i++){
-            var stop = stops[i];
-            
-            if (this.stops[stop.code]){
-                continue;
-            }
-            
-            var coords = stop.coords.split(','),
-                coords = {
-                    longitude: coords[0],
-                    latitude: coords[1]
-                };
-            
-            this.stops[stop.code] = new StopMarker({
-                map: this.map,
-                code: stop.code,
-                position: this.coordsToLatLng(coords)
-            });
+        for(var i = 0; i < data[0].departures.length; i++){
+            var departure = data[0].departures[i];
+            var tr = $('<tr></tr>').appendTo(this.departures.tbody);
+            var time = departure.time.substring(0, 2) + ':' + departure.time.substring(2);
+            tr.append('<td>'+time+'</td>');
+            tr.append('<td>'+departure.code+'</td>');
+            tr.append('<td>'+departure.name1+'</td>');
         }
-        this.fetchingStops = false;
     }
 };
