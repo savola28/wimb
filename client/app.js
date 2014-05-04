@@ -140,46 +140,33 @@ var app =
 
         this.updatingVehicles = true;
         
-        var newVehicles = {},
-            bounds = this.map.getBounds();
+        var bounds = this.map.getBounds();
         
         for(var i = 0; i < vehicles.length; i++)
         {
-            var vehicleId = vehicles[i].MonitoredVehicleJourney.VehicleRef.value,
-                coords = vehicles[i].MonitoredVehicleJourney.VehicleLocation,
-                latLng = this.coordsToLatLng(coords),
-                origin = vehicles[i].MonitoredVehicleJourney.OriginName.value,
-                destination = vehicles[i].MonitoredVehicleJourney.DestinationName.value,
-                route = {origin: origin, destination: destination};
+            var monitoredVehicleJourney = vehicles[i].MonitoredVehicleJourney,
+                vehicleId = monitoredVehicleJourney.VehicleRef.value,
+                latLng = this.coordsToLatLng(monitoredVehicleJourney.VehicleLocation);
             
             if (bounds.contains(latLng) === false){
                 if (this.vehicles[vehicleId]){
-                    this.removeVehicle(vehicleId);
+                    this.vehicles[vehicleId].setMap(null); // clear vehicle marker from the map
+                    delete this.vehicles[vehicleId];
                 }
                 continue;
             }
             
-            var marker = null;
-            
             if (this.vehicles[vehicleId]){
-                marker = this.vehicles[vehicleId];
-                marker.setPosition(latLng);
-                marker.setRoute(route);
-                delete this.vehicles[vehicleId];
+                this.vehicles[vehicleId].setPosition(latLng);
             }
             else{
-                marker = new BusMarker({
+                this.vehicles[vehicleId] = new BusMarker({
                     map: app.map,
-                    content: vehicles[i].MonitoredVehicleJourney.LineRef.value,
-                    position: latLng,
-                    route: route
+                    monitoredVehicleJourney: monitoredVehicleJourney,
+                    position: latLng
                 });
             }
-            
-            newVehicles[vehicleId] = marker;
 		}
-        
-        this.setVehicles(newVehicles);
         
         this.updatingVehicles = false;
     },
@@ -191,7 +178,7 @@ var app =
         if (app.showVehicles === true){
             app.buttons.busses.text('Busses');
             app.showVehicles = false;
-            app.setVehicles({});
+            app.removeVehicles();
         }
         else{
             app.buttons.busses.text('Loading...');
@@ -203,7 +190,7 @@ var app =
     {
     },
     
-    setVehicles: function (vehicles)
+    removeVehicles: function ()
     {
         // clear old markers
         for(var i in this.vehicles){
