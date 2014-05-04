@@ -129,11 +129,12 @@ var app =
     {
         var controls = $('<div class="btn-group-vertical"></div>');
         this.buttons = {
-            busses: $('<button class="btn btn-default active">Loading...</button>').click(app.toggleBusses).appendTo(controls),
-            //stops: $('<button class="btn btn-default disabled">Stops (under construction)</button>').click(app.toggleStops).appendTo(controls),
             location: $('<button class="btn btn-default disabled">My location</button>').click(app.showPosition).appendTo(controls)
         };
-        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controls[0]);        
+        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controls[0]);
+        
+        this.loadingMessage = $('<div class="alert alert-info">Loading...</div>');
+        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.loadingMessage[0]);
     },
     
     fetchStops: function ()
@@ -174,15 +175,15 @@ var app =
     
     updateVehicles: function (data)
     {
-        this.buttons.busses.text('Busses');
-        
         var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
         
-        if (this.showVehicles === false || this.updatingVehicles === true || !vehicles){
+        if (this.updatingVehicles === true || !vehicles){
             return;
         }
 
         this.updatingVehicles = true;
+        
+        this.loadingMessage.addClass('hidden');
         
         var bounds = this.map.getBounds();
         
@@ -213,37 +214,6 @@ var app =
 		}
         
         this.updatingVehicles = false;
-    },
-    
-    toggleBusses: function (event)
-    {
-        app.buttons.busses.toggleClass('active');
-        
-        if (app.showVehicles === true){
-            app.buttons.busses.text('Busses');
-            app.showVehicles = false;
-            app.removeVehicles();
-        }
-        else{
-            app.buttons.busses.text('Loading...');
-            app.showVehicles = true;
-        }
-    },
-    
-    toggleStops: function (event)
-    {
-    },
-    
-    removeVehicles: function ()
-    {
-        // clear old markers
-        for(var i in this.vehicles){
-            if (this.vehicles.hasOwnProperty(i)){
-                this.vehicles[i].setMap(null);
-            }
-        }
-
-        this.vehicles = {};
     },
     
     initModal: function ()
