@@ -6,11 +6,7 @@ var app =
     
     stopMarkers: [],
     
-    showVehicles: true,
-    
     updatingVehicles: false,
-    
-    buttons: null,
     
 	start: function ()
 	{
