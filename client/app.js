@@ -159,7 +159,13 @@ var app =
             sw = bounds.getSouthWest(),
             bbox = [sw.lng(), sw.lat(), ne.lng(), ne.lat()].join(',');
         
-        $.getJSON('stops/'+bbox, this.updateStops.bind(this));
+        $.getJSON('proxy', {
+            request: 'stops_area',
+            bbox: bbox,
+            limit: 100,
+            epsg_in: 'wgs84',
+            epsg_out: 'wgs84'
+        }, this.updateStops.bind(this));
     },
     
     updateStops: function (stops)
@@ -237,7 +243,7 @@ var app =
         var stop = event.data.stop;
         this.departures.title.text(stop.code + ' ' + stop.name);
         this.modal.modal('show');
-        this.departures.stopCode = stop.code;
+        this.departures.stop = stop;
         this.loadDepartures();
     },
 
@@ -248,7 +254,12 @@ var app =
         this.departures.table.addClass('hidden');
         this.departures.tbody.empty();
         
-        $.getJSON('stop/'+this.departures.stopCode, this.renderDepartures.bind(this));
+        $.getJSON('proxy', {
+            request: 'stop',
+            code: this.departures.stop.code,
+            dep_limit: 20,
+            time_limit: 360
+        }, this.renderDepartures.bind(this));
     },
 
     renderDepartures: function (data)

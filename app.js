@@ -1,57 +1,33 @@
 var express = require('express'),
     io = require('socket.io'),
-    http = require('http');
+    http = require('http'),
+    querystring = require('querystring');
 
 var app = express();
 
 app.use(express.static('./client'));
 
-app.get('/stops/:bbox', function(req, res)
+app.get('/proxy', function(proxyReq, proxyRes)
 {
     var options = {
         hostname: 'api.publictransport.tampere.fi',
-        path: '/prod/?limit=100&epsg_in=wgs84&epsg_out=wgs84&request=stops_area&user=its_factory_temp&pass=ITS4devN&bbox=' + req.params.bbox
+        path: '/prod/?&user=its_factory_temp&pass=ITS4devN&' + querystring.stringify(proxyReq.query)
     };
+
+    proxyRes.set('Content-Type', 'application/json');
     
-    res.set('Content-Type', 'application/json');
-    
-    http.get(options, function(stopsRes) {
+    http.get(options, function(res) {
         var data = '';
         
-        stopsRes.setEncoding('utf8');
+        res.setEncoding('utf8');
 
-        stopsRes.on('data', function(chunk){
+        res.on('data', function(chunk){
             data += chunk;
         });
         
-        stopsRes.on('end', function(){
-            res.write(data);
-            res.end();
-        });
-    });
-});
-
-app.get('/stop/:code', function(req, res)
-{
-    var options = {
-        hostname: 'api.publictransport.tampere.fi',
-        path: '/prod/?request=stop&user=its_factory_temp&pass=ITS4devN&dep_limit=20&time_limit=360&code=' + req.params.code
-    };
-
-    res.set('Content-Type', 'application/json');
-    
-    http.get(options, function(stopsRes) {
-        var data = '';
-        
-        stopsRes.setEncoding('utf8');
-
-        stopsRes.on('data', function(chunk){
-            data += chunk;
-        });
-        
-        stopsRes.on('end', function(){
-            res.write(data);
-            res.end();
+        res.on('end', function(){
+            proxyRes.write(data);
+            proxyRes.end();
         });
     });
 });
