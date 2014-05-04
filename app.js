@@ -31,11 +31,11 @@ app.get('/stops/:bbox', function(req, res)
     });
 });
 
-app.get('/stop/:code/:time_limit', function(req, res)
+app.get('/stop/:code', function(req, res)
 {
     var options = {
         hostname: 'api.publictransport.tampere.fi',
-        path: '/prod/?request=stop&user=its_factory_temp&pass=ITS4devN&dep_limit=20&code=' + req.params.code +'&time_limit=' + req.params.time_limit
+        path: '/prod/?request=stop&user=its_factory_temp&pass=ITS4devN&dep_limit=20&time_limit=360&code=' + req.params.code
     };
 
     res.set('Content-Type', 'application/json');

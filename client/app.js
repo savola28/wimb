@@ -260,8 +260,6 @@ var app =
         this.modal.modal({
             show: false
         });
-        
-        $('input[name=time_limit]', app.modal).on('change', this.loadDepartures.bind(this));
     },
     
     startMonitoring: function (event)
@@ -280,10 +278,7 @@ var app =
         this.departures.table.addClass('hidden');
         this.departures.tbody.empty();
         
-        var timeLimit = $('input[name=time_limit]:checked', app.modal).val(),
-            url = ['stop', this.departures.stopCode, timeLimit];
-        
-        $.getJSON(url.join('/'), this.renderDepartures.bind(this));
+        $.getJSON('stop/'+this.departures.stopCode, this.renderDepartures.bind(this));
     },
 
     renderDepartures: function (data)
