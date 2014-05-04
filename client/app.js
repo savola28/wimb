@@ -8,6 +8,12 @@ var app =
     
     updatingVehicles: false,
     
+    favoriteStops: null,
+    
+    favoriteStopButtonGroup: null,
+    
+    favoriteStopButtons: {},
+    
 	start: function ()
 	{
         try{
@@ -114,6 +120,8 @@ var app =
         
         this.initControls();
         
+        this.initFavoriteStops();
+        
         io.connect().on('vehicleUpdate', this.updateVehicles.bind(this));
         
         google.maps.event.addListener(this.map, 'bounds_changed', this.fetchStops.bind(this));
@@ -128,6 +136,24 @@ var app =
         
         this.loadingMessage = $('<div class="alert alert-info">Loading...</div>');
         this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.loadingMessage[0]);
+    },
+    
+    initFavoriteStops: function ()
+    {
+        this.favoriteStopButtonGroup = $('<div class="btn-group-vertical"></div>');
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(this.favoriteStopButtonGroup[0]);
+        
+        this.favoriteStops = JSON.parse(localStorage.getItem('stops'));
+        if (!this.favoriteStops){
+            this.favoriteStops = {};
+        }
+        
+        for(var i in this.favoriteStops){
+            if (!this.favoriteStops.hasOwnProperty(i)){
+                continue;
+            }
+            this.addFavoriteStopButton(this.favoriteStops[i]);
+        }
     },
     
     fetchStops: function ()
@@ -223,7 +249,8 @@ var app =
             info: $('i', this.modal),
             table: $('table', this.modal),
             tbody: $('tbody', this.modal),
-            stopCode: ''
+            favoriteButton: $('button.btn', this.modal).click(this.toggleFavoriteStop.bind(this)),
+            stop: null
         };
 
         this.modal.modal({
@@ -237,6 +264,9 @@ var app =
         this.departures.title.text(stop.code + ' ' + stop.name);
         this.modal.modal('show');
         this.departures.stop = stop;
+    
+        this.toggleFavoriteButtonText();
+        
         this.loadDepartures();
     },
 
@@ -273,5 +303,48 @@ var app =
             tr.append('<td>'+departure.code+'</td>');
             tr.append('<td>'+departure.name1+'</td>');
         }
+    },
+    
+    toggleFavoriteStop: function ()
+    {
+        if (this.favoriteStops[this.departures.stop.code]){
+            this.removeFavoriteStop(this.departures.stop);
+        }
+        else{
+            this.addFavoriteStop(this.departures.stop);
+        }
+        
+        this.toggleFavoriteButtonText();
+    },
+    
+    toggleFavoriteButtonText: function ()
+    {
+        if (this.favoriteStops[this.departures.stop.code]){
+            this.departures.favoriteButton.text('Remove from favorites');
+        }
+        else{
+            this.departures.favoriteButton.text('Add to favorites');
+        }    
+    },
+    
+    addFavoriteStop: function (stop)
+    {
+        this.favoriteStops[stop.code] = stop;
+        this.addFavoriteStopButton(stop);
+        localStorage.setItem('stops', JSON.stringify(this.favoriteStops));
+    },
+    
+    removeFavoriteStop: function (stop)
+    {
+        this.favoriteStopButtons[stop.code].remove();
+        delete this.favoriteStopButtons[stop.code];
+        delete this.favoriteStops[stop.code];
+        localStorage.setItem('stops', JSON.stringify(this.favoriteStops));
+    },
+    
+    addFavoriteStopButton: function (stop)
+    {
+        var button = $('<button type="button" class="btn btn-default">'+stop.code + ' ' + stop.name+'</button>').on('click', {stop: stop}, this.startMonitoring.bind(this));
+        this.favoriteStopButtons[stop.code] = button.appendTo(this.favoriteStopButtonGroup);
     }
 };
