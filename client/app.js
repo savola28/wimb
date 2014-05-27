@@ -164,7 +164,7 @@ var app =
         
         this.fetchingStops = true;
         
-        if (this.map.getZoom() < 17){
+        if (this.map.getZoom() < 18){
             for(var i = 0; i < this.stopMarkers.length; i++){
                 this.stopMarkers[i].setMap(null);
             }
