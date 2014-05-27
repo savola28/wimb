@@ -33,6 +33,10 @@ BusMarker.prototype.onRemove = function() {
 };
 
 BusMarker.prototype.setPosition = function(position) {
+    if (!this._element){
+        return;
+    }
+    
     this._position = position;
     var overlayProjection = this.getProjection();
     var pixelPosition = overlayProjection.fromLatLngToDivPixel(position),
