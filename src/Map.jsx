@@ -29,20 +29,46 @@ module.exports = React.createClass({
 	tryToActivate: function (){
 		if (this.props.activeView === 'map'){
 			this.createMap();
-			vehicleMonitor.start();
 		}
 		else {
 			vehicleMonitor.stop();
 		}
 	},
 	
-	createMap: function (){
+	getInitialCoordinates: function (){
+		function geo_success(position) {
+			this.createMap(position.coords);
+		}
+		
+		function geo_error() {
+			var tampereCoordinates = {
+				latitude: 61.49815,
+				longitude: 23.76103
+			};
+			this.createMap(tampereCoordinates);
+		}
+				
+		if (!("geolocation" in navigator)) {
+			geo_error.call(this);
+			return;
+		}
+		
+		navigator.geolocation.getCurrentPosition(geo_success.bind(this), geo_error.bind(this));
+	},
+	
+	createMap: function (coordinates){
 		if (this.map){
+			vehicleMonitor.start();
+			return;
+		}
+		
+		if (!coordinates){
+			this.getInitialCoordinates();
 			return;
 		}
 		
 		this.map = new gmaps.Map(this.getDOMNode(), {
-			center: new gmaps.LatLng(61.49815, 23.76103), // Tampere
+			center: new gmaps.LatLng(coordinates.latitude, coordinates.longitude),
 			zoom: 14,
 			mapTypeId: gmaps.MapTypeId.ROADMAP,
 			disableDefaultUI: true,
@@ -62,6 +88,8 @@ module.exports = React.createClass({
 		createControlsNode(this.map);
 		
 		vehicleMonitor.map = this.map;
+		
+		vehicleMonitor.start();
 	}
 });
 
