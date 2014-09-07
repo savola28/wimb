@@ -15,23 +15,10 @@ module.exports = React.createClass({
 	},
 	
 	render: function() {
-	    var content;
+	    var departures = <i>No departures</i>;
 	    
 	    if (this.props.departures.length){
-	        content = (
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Line</th>
-                        </tr>
-                    </thead>
-                    <tbody>{this.renderDepartures()}</tbody>
-                </table>
-            );
-	    }
-	    else{
-	        content = <i>No departures</i>;
+	        departures = this.renderDepartures();
 	    }
 
         var iconClass = 'glyphicon glyphicon-star';
@@ -45,24 +32,38 @@ module.exports = React.createClass({
 	    			<span className={iconClass}></span>
 	    			{this.props.stop.code} {this.props.stop.name}
 	    		</button>
-                {content}
+                {departures}
             </div>
 		);
 	},
 	
 	renderDepartures: function (data){
-        return this.props.departures.map(function(departure) {
-        	var date = departureToDate(departure),
-        		time = timeFormatter.format(date),
-        		deltaTime = moment(date).fromNow();
+		return (
+			<table className="table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Line</th>
+                    </tr>
+                </thead>
+                <tbody>
+                	{this.props.departures.map(this.renderDeparture)}
+                </tbody>
+            </table>
+        );
+	},
+	
+	renderDeparture: function (departure, key){
+    	var date = departureToDate(departure),
+    		time = timeFormatter.format(date),
+    		deltaTime = moment(date).fromNow();
 
-        	return (
-                <tr key={date.toISOString() + departure.code}>
-                    <td title={time}>{deltaTime}</td>
-                    <td title={departure.name1}>{departure.code}</td>
-        	    </tr>
-        	);
-		}.bind(this));
+    	return (
+            <tr key={key}>
+                <td title={time}>{deltaTime}</td>
+                <td title={departure.name1}>{departure.code}</td>
+    	    </tr>
+    	);
     },
 	
 	toggleFavoriteStop: function (){
@@ -86,5 +87,15 @@ function departureToDate(departure){
         hours = time.substr(0, 2),
         minutes = time.substr(2, 2);
     
-    return new Date(year + '-' + month + '-' + day + ' ' + hours + ':' + minutes);
+    if (hours < 24){
+    	return new Date(year + '-' + month + '-' + day + ' ' + hours + ':' + minutes);
+    }
+    
+    hours = hours - 24;
+    
+    date = new Date(year + '-' + month + '-' + day + ' ' + hours + ':' + minutes);
+    
+    date.setDate(date.getDate() + 1);
+	
+	return date;
 }
