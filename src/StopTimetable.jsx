@@ -1,5 +1,10 @@
 /** @jsx React.DOM */
-var favoriteStorage = require('./favoriteStorage.js');
+var favoriteStorage = require('./favoriteStorage.js'),
+	locale = 'fi',
+	options = {hour: 'numeric', minute: 'numeric'},
+	timeFormatter = new Intl.DateTimeFormat(locale, options);
+
+moment.locale(locale);
 
 module.exports = React.createClass({
 	getInitialState: function() {
@@ -47,11 +52,13 @@ module.exports = React.createClass({
 	
 	renderDepartures: function (data){
         return this.props.departures.map(function(departure) {
-        	var date = departureToDate(departure);
+        	var date = departureToDate(departure),
+        		time = timeFormatter.format(date),
+        		deltaTime = moment(date).fromNow();
 
         	return (
                 <tr key={date.toISOString() + departure.code}>
-                    <td>{date.toLocaleTimeString('fi')}</td>
+                    <td title={time}>{deltaTime}</td>
                     <td title={departure.name1}>{departure.code}</td>
         	    </tr>
         	);
@@ -80,4 +87,4 @@ function departureToDate(departure){
         minutes = time.substr(2, 2);
     
     return new Date(year + '-' + month + '-' + day + ' ' + hours + ':' + minutes);
-} 
+}

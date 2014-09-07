@@ -173,7 +173,12 @@ module.exports = React.createClass({displayName: 'exports',
 
 },{}],5:[function(require,module,exports){
 /** @jsx React.DOM */
-var favoriteStorage = require('./favoriteStorage.js');
+var favoriteStorage = require('./favoriteStorage.js'),
+	locale = 'fi',
+	options = {hour: 'numeric', minute: 'numeric'},
+	timeFormatter = new Intl.DateTimeFormat(locale, options);
+
+moment.locale(locale);
 
 module.exports = React.createClass({displayName: 'exports',
 	getInitialState: function() {
@@ -221,11 +226,13 @@ module.exports = React.createClass({displayName: 'exports',
 	
 	renderDepartures: function (data){
         return this.props.departures.map(function(departure) {
-        	var date = departureToDate(departure);
+        	var date = departureToDate(departure),
+        		time = timeFormatter.format(date),
+        		deltaTime = moment(date).fromNow();
 
         	return (
                 React.DOM.tr({key: date.toISOString() + departure.code}, 
-                    React.DOM.td(null, date.toLocaleTimeString('fi')), 
+                    React.DOM.td({title: time}, deltaTime), 
                     React.DOM.td({title: departure.name1}, departure.code)
         	    )
         	);
@@ -254,7 +261,8 @@ function departureToDate(departure){
         minutes = time.substr(2, 2);
     
     return new Date(year + '-' + month + '-' + day + ' ' + hours + ':' + minutes);
-} 
+}
+
 },{"./favoriteStorage.js":7}],6:[function(require,module,exports){
 var App = require('./App.jsx');
 
