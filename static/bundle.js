@@ -92,8 +92,6 @@ module.exports = React.createClass({displayName: 'exports',
 			]
 		});
 		
-		//createInfoNode(this.map);
-		
 		createPositionButton(this.map);
 		
 		createControlsNode(this.map);
@@ -101,17 +99,6 @@ module.exports = React.createClass({displayName: 'exports',
 		vehicleMonitor.map = this.map;
 	}
 });
-
-function createInfoNode(map){
-	var infoNode = $('<div class="alert alert-info hidden" role="alert"></div>');
-	map.controls[gmaps.ControlPosition.TOP_LEFT].push(infoNode[0]);
-	map.showInfo = function (infoText){
-		infoNode.text(infoText).removeClass('hidden');
-	};
-	map.hideInfo = function (){
-		infoNode.text('').addClass('hidden');
-	};
-}
 
 function createControlsNode(map){
 	map.controlsNode = document.createElement('div');
@@ -459,7 +446,7 @@ module.exports = {
 		var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
 
 		if (!vehicles){
-			this.map.showInfo('No vehicle data available');
+			alert('No vehicle data available');
 			return;
 		}
 
@@ -468,7 +455,6 @@ module.exports = {
 
 		for(var i = 0; i < vehicles.length; i++){
 			var monitoredVehicleJourney = vehicles[i].MonitoredVehicleJourney,
-			lineRef = monitoredVehicleJourney.LineRef.value,
 			vehicleRef = monitoredVehicleJourney.VehicleRef.value,
 			coords = monitoredVehicleJourney.VehicleLocation,
 			position = new gmaps.LatLng(coords.Latitude, coords.Longitude),

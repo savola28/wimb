@@ -40,7 +40,7 @@ module.exports = {
 		var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
 
 		if (!vehicles){
-			this.map.showInfo('No vehicle data available');
+			alert('No vehicle data available');
 			return;
 		}
 
@@ -49,7 +49,6 @@ module.exports = {
 
 		for(var i = 0; i < vehicles.length; i++){
 			var monitoredVehicleJourney = vehicles[i].MonitoredVehicleJourney,
-			lineRef = monitoredVehicleJourney.LineRef.value,
 			vehicleRef = monitoredVehicleJourney.VehicleRef.value,
 			coords = monitoredVehicleJourney.VehicleLocation,
 			position = new gmaps.LatLng(coords.Latitude, coords.Longitude),

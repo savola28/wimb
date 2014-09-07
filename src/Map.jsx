@@ -57,8 +57,6 @@ module.exports = React.createClass({
 			]
 		});
 		
-		//createInfoNode(this.map);
-		
 		createPositionButton(this.map);
 		
 		createControlsNode(this.map);
@@ -66,17 +64,6 @@ module.exports = React.createClass({
 		vehicleMonitor.map = this.map;
 	}
 });
-
-function createInfoNode(map){
-	var infoNode = $('<div class="alert alert-info hidden" role="alert"></div>');
-	map.controls[gmaps.ControlPosition.TOP_LEFT].push(infoNode[0]);
-	map.showInfo = function (infoText){
-		infoNode.text(infoText).removeClass('hidden');
-	};
-	map.hideInfo = function (){
-		infoNode.text('').addClass('hidden');
-	};
-}
 
 function createControlsNode(map){
 	map.controlsNode = document.createElement('div');
