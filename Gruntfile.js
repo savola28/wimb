@@ -17,13 +17,32 @@ module.exports = function(grunt) {
                 src: ['src/entry.js'],
                 dest: 'static/bundle.js'
             }
+        },
+        
+        uglify: {
+            options: {},
+            dist: {
+                files: {
+                    'static/bundle.js': ['static/bundle.js']
+                }
+            }
+        },
+        
+        jshint: {
+            files: ['Gruntfile.js', 'src/**/*.js', 'src/**/*.jsx'],
+            options: {
+                globals: {
+                    module: true,
+                    document: true
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-jsxhint');
 
-    grunt.registerTask('default', [
-        'browserify'
-    ]);
+    grunt.registerTask('default', ['jshint', 'browserify', 'uglify']);
 };

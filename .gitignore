@@ -1,3 +1,5 @@
 node_modules/*
 heroku-client/*
 .c9/*
+static/bundle.min.js
+static/bundle.js

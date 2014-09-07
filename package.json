@@ -5,12 +5,18 @@
     "description": "WIMB (where is my bus) tells you from where and when your next bus leaves and where it is right now",
     "private": true,
     "dependencies" : {
-        "express"   : "*"
-    },
-    "devDependencies": {
+        "express"               : "*",
         "grunt"                 : "*",
+        "grunt-cli"             : "*",
         "grunt-contrib-watch"   : "*",
         "grunt-react"           : "*",
-        "grunt-browserify"      : "*"
+        "grunt-browserify"      : "*",
+        "grunt-contrib-uglify"  : "*",
+        "grunt-contrib-jshint"  : "*",
+        "grunt-jsxhint"         : "*",
+        "react-tools"           : "*"
+    },
+    "scripts": {
+        "postinstall": "echo postinstall time; ./node_modules/grunt-cli/bin/grunt"
     }
 }
