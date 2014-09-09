@@ -1,8 +1,7 @@
 /** @jsx React.DOM */
 var favoriteStorage = require('./favoriteStorage.js'),
 	locale = 'fi',
-	options = {hour: 'numeric', minute: 'numeric'},
-	timeFormatter = new Intl.DateTimeFormat(locale, options);
+	timeOptions = {hour: 'numeric', minute: 'numeric'};
 
 moment.locale(locale);
 
@@ -55,7 +54,7 @@ module.exports = React.createClass({
 	
 	renderDeparture: function (departure, key){
     	var date = departureToDate(departure),
-    		time = timeFormatter.format(date),
+    		time = date.toLocaleTimeString(locale, timeOptions),
     		deltaTime = moment(date).fromNow();
 
     	return (
