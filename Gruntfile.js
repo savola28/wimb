@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         watch: {
             react: {
                 files: 'src/**/*',
-                tasks: ['browserify:dev']
+                tasks: ['jshint', 'browserify:dev']
             }
         },
 
@@ -20,7 +20,6 @@ module.exports = function(grunt) {
         },
         
         uglify: {
-            options: {},
             dist: {
                 files: {
                     'static/bundle.js': ['static/bundle.js']
@@ -31,9 +30,15 @@ module.exports = function(grunt) {
         jshint: {
             files: ['Gruntfile.js', 'src/**/*.js', 'src/**/*.jsx'],
             options: {
+                undef: true,
+                node: true,
+                jquery: true,
+                browser: true,
                 globals: {
-                    module: true,
-                    document: true
+                    React: false,
+                    google: false,
+                    GeolocationMarker: false,
+                    moment: false
                 }
             }
         }
