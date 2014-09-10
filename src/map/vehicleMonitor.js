@@ -211,6 +211,7 @@ function showStopInfoWindow(){
 function showStopInfoWindowContent(data){
 	
 	var containerNode = document.createElement('div');
+	containerNode.className = 'map-infowindow-stop';
 	
 	this.infoWindow.setContent(containerNode);
 	
