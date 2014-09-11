@@ -78,7 +78,7 @@ module.exports = {
 		this.vehicles = newVehicles;
 
 		if (this.isMonitorOn){
-			setTimeout(this.fetchVehicleData.bind(this), 500);
+			this.fetchVehicleData();
 		}
 		else{
 			this.removeVehicles();
