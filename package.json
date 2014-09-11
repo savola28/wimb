@@ -17,6 +17,7 @@
         "react-tools"           : "*"
     },
     "scripts": {
-        "postinstall": "./node_modules/grunt-cli/bin/grunt"
+        "postinstall": "./node_modules/grunt-cli/bin/grunt",
+        "start": "node app.js"
     }
 }
