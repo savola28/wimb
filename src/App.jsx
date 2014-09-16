@@ -8,8 +8,8 @@ module.exports = React.createClass({
 		return (
 			<div className="app">
 			    <Menu views={['home', 'map']} activeView={this.props.activeView} />
-			    <MainView activeView={this.props.activeView} />
-			    <MapComponent activeView={this.props.activeView} />
+			    <MainView activeView={this.props.activeView} position={this.props.position} />
+			    <MapComponent activeView={this.props.activeView} position={this.props.position} />
 		    </div>
 		);
 	}

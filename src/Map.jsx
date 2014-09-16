@@ -35,36 +35,20 @@ module.exports = React.createClass({
 		}
 	},
 	
-	getInitialCoordinates: function (){
-		function geo_success(position) {
-			this.createMap(position.coords);
-		}
-		
-		function geo_error() {
-			var tampereCoordinates = {
-				latitude: 61.49815,
-				longitude: 23.76103
-			};
-			this.createMap(tampereCoordinates);
-		}
-				
-		if (!("geolocation" in navigator)) {
-			geo_error.call(this);
-			return;
-		}
-		
-		navigator.geolocation.getCurrentPosition(geo_success.bind(this), geo_error.bind(this));
-	},
-	
-	createMap: function (coordinates){
+	createMap: function (){
 		if (this.map){
 			vehicleMonitor.start();
 			return;
 		}
 		
-		if (!coordinates){
-			this.getInitialCoordinates();
-			return;
+		// default is central of Tampere
+		var coordinates = {
+			latitude: 61.49815,
+			longitude: 23.76103
+		};
+		
+		if (this.props.position){
+			coordinates = this.props.position.coords;
 		}
 		
 		this.map = new gmaps.Map(this.getDOMNode(), {
