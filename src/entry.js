@@ -1,19 +1,28 @@
-var App = require('./App.jsx');
+var App = require('./App.jsx'),
+    position = null;
 
-window.onhashchange = renderApp;
-		
+window.onhashchange = renderWithoutPosition;
+
 if (!("geolocation" in navigator)) {
-	renderApp();
+	renderWithoutPosition();
 }
 else {
-    navigator.geolocation.getCurrentPosition(renderApp, renderApp);
+    navigator.geolocation.getCurrentPosition(renderApp, renderWithoutPosition);
 }
 
-function renderApp(position){
+function renderWithoutPosition() {
+    renderApp();
+}
+
+function renderApp(newPosition){
     var activeView = location.hash.substring(1) || 'home',
         title = activeView === 'home' ? '' : ' - ' + activeView;
     
     document.title = 'WIMB' + title;
+    
+    if (newPosition){
+        position = newPosition;
+    }
     
     React.renderComponent(App({
         activeView: activeView,
