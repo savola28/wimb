@@ -1,26 +1,33 @@
 module.exports = {
-    add: function(storage, id, value){
-        var items = this.getAll(storage);
-        items[id] = value || {};
-        this._storeItems(storage, items);
+    add: function(storageKey, id, item){
+        var storage = this._getStorage(storageKey),
+            index = storage.items.push(item) - 1;
+        storage.ids[id] = index;
+        this._setStorage(storageKey, storage);
     },
     
-    remove: function(storage, id){
-        var items = this.getAll(storage);
-        delete items[id];
-        this._storeItems(storage, items);
+    remove: function(storageKey, id){
+        var storage = this._getStorage(storageKey);
+        storage.items.splice(storage.ids[id]);
+        delete storage.ids[id];
+        this._setStorage(storageKey, storage);
     },
     
-    get: function(storage, id){
-        var items = this.getAll(storage);
-        return items[id];
+    get: function(storageKey, id){
+        var storage = this._getStorage(storageKey);
+        return storage.items[storage.ids[id]];
     },
     
-    getAll: function(storage){
-        return JSON.parse(localStorage.getItem(storage)) || {};
+    getAll: function (storageKey){
+        var storage = this._getStorage(storageKey);
+        return storage.items;
     },
     
-    _storeItems: function(storage, items){
-        return localStorage.setItem(storage, JSON.stringify(items));
+    _getStorage: function(key){
+        return JSON.parse(localStorage.getItem(key)) || {items: [], ids: {}};
+    },
+    
+    _setStorage: function(key, value){
+        return localStorage.setItem(key, JSON.stringify(value));
     }
 };
