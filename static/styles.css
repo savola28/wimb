@@ -38,3 +38,8 @@ body {
     overflow-y: scroll;
     overflow-x: hidden;
 }
+
+.borderless td,
+.borderless th {
+    border: none !important;
+}

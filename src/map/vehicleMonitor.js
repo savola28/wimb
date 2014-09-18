@@ -208,7 +208,7 @@ function showStopInfoWindow(){
     }, showStopInfoWindowContent.bind(this));
 }
 
-function showStopInfoWindowContent(data){
+function showStopInfoWindowContent(stops){
 	
 	var containerNode = document.createElement('div');
 	containerNode.className = 'map-infowindow-stop';
@@ -216,7 +216,6 @@ function showStopInfoWindowContent(data){
 	this.infoWindow.setContent(containerNode);
 	
 	React.renderComponent(StopTimetable({
-		stop: this.stop,
-		departures: data[0].departures
+		stop: stops[0]
 	}), containerNode);
 }
