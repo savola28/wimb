@@ -216,6 +216,7 @@ function showStopInfoWindowContent(stops){
 	this.infoWindow.setContent(containerNode);
 	
 	React.renderComponent(StopTimetable({
-		stop: stops[0]
+		stop: stops[0],
+		renderOnlyOneDepartures: true
 	}), containerNode);
 }

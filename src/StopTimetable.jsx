@@ -36,11 +36,20 @@ module.exports = React.createClass({
 	
 	renderLine: function (line, index) {
 		var startEnd = line.route.split(' - '),
-			destination = startEnd[line.direction - 1];
+			destination = startEnd[line.direction - 1],
+			departures;
+		
+		if (this.props.renderOnlyOneDepartures){
+			departures = this.renderDeparture(line.departures[0]);
+		}
+		else{
+			departures = line.departures.map(this.renderDeparture);
+		}
+		
 		return (
 			<tr key={index}>
 				<th>{line.code} &rarr; {destination}</th>
-				{line.departures.map(this.renderDeparture)}
+				{departures}
 			</tr>
 		);
 	},
