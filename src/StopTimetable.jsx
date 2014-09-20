@@ -7,25 +7,51 @@ moment.locale(locale);
 
 module.exports = React.createClass({
 	getInitialState: function() {
-		if (favoriteStorage.get('stops', this.props.stop.code)){
-			return {isFavorite: true};
+		return {
+			isFavorite: favoriteStorage.exists('stops', this.props.stop.code),
+			departures: []
+		};
+	},
+	
+	componentDidUpdate: function (){
+		if (this.props.onDeparturesRendered){
+			this.props.onDeparturesRendered();
 		}
-		return {isFavorite: false};
+	},
+	
+	componentDidMount: function() {
+		$.getJSON('api', {
+			request: 'stop',
+			code: this.props.stop.code,
+			dep_limit: 20,
+			time_limit: 360
+		}, handleJSON.bind(this));
+		
+		function handleJSON(stops){
+			this.setState({
+				isFavorite: this.state.isFavorite,
+				departures: stops[0].departures
+			});			
+		}
 	},
 	
 	render: function() {
+		if (!this.state.departures.length){
+			return null;
+		}
+		
 		var iconClass = 'glyphicon glyphicon-star';
 		if (!this.state.isFavorite){
 			iconClass += '-empty';
 		}
 		
-		var lines = getDeparturesByLines(this.props.stop);
+		var lines = getDeparturesByLines(this.state.departures);
 		
 		return (
 			<div>
 				<button type="button" className="btn btn-default" onClick={this.toggleFavoriteStop}>
 					<span className={iconClass}></span>
-					{this.props.stop.code} {this.props.stop.name_fi}
+					{this.props.stop.code} {this.props.stop.name}
 				</button>
 				<table className="table borderless">
 					{lines.map(this.renderLine)}
@@ -84,12 +110,12 @@ module.exports = React.createClass({
 	}
 });
 
-function getDeparturesByLines(stop) {
+function getDeparturesByLines(departures) {
 	var lines = [],
 		lineIds = {};
 		
-	for(var i = 0; i < stop.departures.length; i++){
-		var departure = stop.departures[i],
+	for(var i = 0; i < departures.length; i++){
+		var departure = departures[i],
 			lineId = [departure.code, departure.name1, departure.direction].join(','),
 			index = lineIds[lineId];
 		

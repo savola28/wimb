@@ -199,24 +199,14 @@ function showStopInfoWindow(){
 	this.infoWindow.setContent('Loading...');
 	
 	this.infoWindow.open(this.getMap(), this);
-	
-    $.getJSON('api', {
-        request: 'stop',
-        code: this.stop.code,
-        dep_limit: 20,
-        time_limit: 360
-    }, showStopInfoWindowContent.bind(this));
-}
 
-function showStopInfoWindowContent(stops){
-	
-	var containerNode = document.createElement('div');
-	containerNode.className = 'map-infowindow-stop';
-	
-	this.infoWindow.setContent(containerNode);
-	
+	var containerNode = $('<div class="map-infowindow-stop"></div>')[0];
+
 	React.renderComponent(StopTimetable({
-		stop: stops[0],
-		renderOnlyOneDepartures: true
+		stop: this.stop,
+		renderOnlyOneDepartures: true,
+		onDeparturesRendered: function (){
+			this.infoWindow.setContent(containerNode);
+		}.bind(this)
 	}), containerNode);
 }
