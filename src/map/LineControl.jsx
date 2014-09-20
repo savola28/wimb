@@ -3,10 +3,7 @@ var favoriteStorage = require('../favoriteStorage.js');
 
 module.exports =  React.createClass({
 	getInitialState: function() {
-		if (favoriteStorage.get('lines', this.props.line.code_short)){
-			return {isFavorite: true};
-		}
-		return {isFavorite: false};
+		return {isFavorite: favoriteStorage.exists('lines', this.props.line.code_short)};
 	},
 	
 	render: function() {

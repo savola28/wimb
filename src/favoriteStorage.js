@@ -13,6 +13,11 @@ module.exports = {
         this._setStorage(storageKey, storage);
     },
     
+    exists: function (storageKey, id){
+        var storage = this._getStorage(storageKey);
+        return (typeof storage.ids[id] !== "undefined");        
+    },
+    
     get: function(storageKey, id){
         var storage = this._getStorage(storageKey);
         return storage.items[storage.ids[id]];
