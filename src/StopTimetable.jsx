@@ -9,7 +9,7 @@ module.exports = React.createClass({
 	getInitialState: function() {
 		return {
 			isFavorite: favoriteStorage.exists('stops', this.props.stop.code),
-			departures: []
+			departures: this.props.departures || []
 		};
 	},
 	
@@ -20,6 +20,10 @@ module.exports = React.createClass({
 	},
 	
 	componentDidMount: function() {
+		if (!this.state.departures-length){
+			return;
+		}
+		
 		$.getJSON('api', {
 			request: 'stop',
 			code: this.props.stop.code,
@@ -36,8 +40,17 @@ module.exports = React.createClass({
 	},
 	
 	render: function() {
-		if (!this.state.departures.length){
-			return null;
+		return (
+			<div>
+				{this.renderFavoriteToggler()}
+				{this.renderLines()}
+			</div>
+		);
+	},
+	
+	renderFavoriteToggler: function (){
+		if (!this.props.enableFavoriteToggler){
+			return '';
 		}
 		
 		var iconClass = 'glyphicon glyphicon-star';
@@ -45,18 +58,25 @@ module.exports = React.createClass({
 			iconClass += '-empty';
 		}
 		
+		return (
+			<button type="button" className="btn btn-default" onClick={this.toggleFavoriteStop}>
+				<span className={iconClass}></span>
+				{this.props.stop.code} {this.props.stop.name}
+			</button>
+		);
+	},
+	
+	renderLines: function (){
+		if (!this.state.departures.length){
+			return (<div className="panel-body">Loading...</div>);
+		}
+		
 		var lines = getDeparturesByLines(this.state.departures);
 		
 		return (
-			<div>
-				<button type="button" className="btn btn-default" onClick={this.toggleFavoriteStop}>
-					<span className={iconClass}></span>
-					{this.props.stop.code} {this.props.stop.name}
-				</button>
-				<table className="table borderless">
-					{lines.map(this.renderLine)}
-				</table>
-			</div>
+			<table className="table borderless">
+				{lines.map(this.renderLine)}
+			</table>
 		);
 	},
 	

@@ -43,3 +43,7 @@ body {
 .borderless th {
     border: none !important;
 }
+
+.nonfluid {
+   width: auto;
+}
