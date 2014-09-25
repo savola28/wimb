@@ -69,7 +69,7 @@ module.exports = React.createClass({
 		
 		createPositionButton(this.map);
 		
-		createControlsNode(this.map);
+		createLineControlNode(this.map);
 		
 		vehicleMonitor.map = this.map;
 		
@@ -77,9 +77,9 @@ module.exports = React.createClass({
 	}
 });
 
-function createControlsNode(map){
-	map.controlsNode = document.createElement('div');
-	map.controls[gmaps.ControlPosition.TOP_LEFT].push(map.controlsNode);
+function createLineControlNode(map){
+	map.lineControlNode = document.createElement('div');
+	map.controls[gmaps.ControlPosition.TOP_LEFT].push(map.lineControlNode);
 }
 
 function createPositionButton(map){

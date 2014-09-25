@@ -96,9 +96,8 @@ module.exports = {
 	
 	toggleTrackLine: function (event){
 		if (this.trackedLineRef){
-			React.unmountComponentAtNode(this.lineControlNode);
+			React.unmountComponentAtNode(this.map.lineControlNode);
 			this.trackedLineRef = '';
-			this.removeLinePolyline();
 			this.removeStopMarkers();
 		}
 		else{
@@ -109,54 +108,25 @@ module.exports = {
 	},
 	
 	fetchLine: function (lineRef){
+		$(this.map.lineControlNode).append('<div class="alert alert-info" role="alert">Loading stops...</div>');
+		
 		$.getJSON('api', {
 			request: 'lines',
 			query: lineRef,
 			epsg_in: 'wgs84',
 			epsg_out: 'wgs84'
-		}, this.showLine.bind(this));
+		}, this.showLineStops.bind(this));
 	},
 
-	showLine: function (linesData){
-		var lineData = linesData[0];
-		this.addLineControl(lineData);
-		this.createLinePolyline(lineData);
-		this.createStopMarkers(lineData.line_stops);
-	},
-	
-	addLineControl: function (lineData){
-		if (!this.lineControlNode){
-			this.lineControlNode = document.createElement('div');
-			$(this.map.controlsNode).append(this.lineControlNode);
+	showLineStops: function (lines){
+		for(var i = 0; i < lines.length; i++){
+			this.createStopMarkers(lines[i].line_stops);
 		}
 		
 		React.renderComponent(LineControl({
-			line: lineData,
+			lineCode: lines[0].code_short,
 			closeHandler: this.toggleTrackLine.bind(this)
-		}), this.lineControlNode);
-	},
-	
-	createLinePolyline: function (lineData){
-		var lineCoords = lineData.line_shape.split('|');
-			
-		var path = lineCoords.map(function (coords){
-			coords = coords.split(',');
-			return new gmaps.LatLng(coords[1], coords[0]);
-		});
-	
-		this.linePolyline = new gmaps.Polyline({
-			path: path,
-			geodesic: true,
-			strokeColor: '#FF0000',
-			strokeOpacity: 1.0,
-			strokeWeight: 1,
-			map: this.map
-		});
-	},
-
-	removeLinePolyline: function (){
-		this.linePolyline.setMap(null);
-		this.linePolyline = null;		
+		}), this.map.lineControlNode);
 	},
 	
 	createStopMarkers: function (stops){
