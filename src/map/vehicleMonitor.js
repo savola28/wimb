@@ -52,9 +52,10 @@ module.exports = {
 			vehicleRef = monitoredVehicleJourney.VehicleRef.value,
 			coords = monitoredVehicleJourney.VehicleLocation,
 			position = new gmaps.LatLng(coords.Latitude, coords.Longitude),
+			destination = monitoredVehicleJourney.DestinationName.value,
 			vehicleMarker = this.vehicles[vehicleRef];
 
-			if (!bounds.contains(position)){
+			if (!destination || !bounds.contains(position)){
 				continue;
 			}
 
