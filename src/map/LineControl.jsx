@@ -3,7 +3,7 @@ var favoriteStorage = require('../favoriteStorage.js');
 
 module.exports =  React.createClass({
 	getInitialState: function() {
-		return {isFavorite: favoriteStorage.exists('lines', this.props.line.code_short)};
+		return {isFavorite: favoriteStorage.exists('lines', this.props.lineCode)};
 	},
 	
 	render: function() {
@@ -16,7 +16,7 @@ module.exports =  React.createClass({
 		    <div className="btn-group">
 	    		<button type="button" className="btn btn-default" onClick={this.toggleFavoriteLine}>
 	    			<span className={iconClass}></span>
-	    			{this.props.line.code_short}
+	    			{this.props.lineCode}
 	    		</button>
 	            <button type="button" className="btn btn-default" onClick={this.props.closeHandler}>
 	                <span className="glyphicon glyphicon-remove"></span>
@@ -27,11 +27,11 @@ module.exports =  React.createClass({
 	
 	toggleFavoriteLine: function (){
 		if (this.state.isFavorite){
-			favoriteStorage.remove('lines', this.props.line.code_short);
+			favoriteStorage.remove('lines', this.props.lineCode);
 			this.setState({isFavorite: false});
 		}
 		else{
-			favoriteStorage.add('lines', this.props.line.code_short);
+			favoriteStorage.add('lines', this.props.lineCode);
 			this.setState({isFavorite: true});
 		}
 	}
