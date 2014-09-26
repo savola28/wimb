@@ -120,8 +120,17 @@ module.exports = {
 	},
 
 	showLineStops: function (lines){
+		var renderedStops = {};
 		for(var i = 0; i < lines.length; i++){
-			this.createStopMarkers(lines[i].line_stops);
+			var stops = lines[i].line_stops;
+			for(var j = 0; j < stops.length; j++){
+				var stop = stops[j];
+				if (renderedStops[stop.code]){
+					continue;
+				}
+				renderedStops[stop.code] = true;
+				this.createStopMarker(stop);
+			}
 		}
 		
 		React.renderComponent(LineControl({
@@ -130,28 +139,25 @@ module.exports = {
 		}), this.map.lineControlNode);
 	},
 	
-	createStopMarkers: function (stops){
-		for(var i = 0; i < stops.length; i++){
-			var stop = stops[i],
-				coords = stop.coords.split(','),
-				longitude = coords[0],
-				latitude = coords[1],
-				position = new gmaps.LatLng(latitude, longitude),
-				stopMarker = new gmaps.Marker({
-					map: this.map,
-					position: position,
-					icon: {
-						path: gmaps.SymbolPath.CIRCLE,
-						scale: 3
-					},
-					stop: stop,
-					infoWindow: null
-				});
-			
-			gmaps.event.addListener(stopMarker, 'click', showStopInfoWindow.bind(stopMarker));
-			
-  			this.stopMarkes.push(stopMarker);
-		}
+	createStopMarker: function (stop){
+		var coords = stop.coords.split(','),
+			longitude = coords[0],
+			latitude = coords[1],
+			position = new gmaps.LatLng(latitude, longitude),
+			stopMarker = new gmaps.Marker({
+				map: this.map,
+				position: position,
+				icon: {
+					path: gmaps.SymbolPath.CIRCLE,
+					scale: 3
+				},
+				stop: stop,
+				infoWindow: null
+			});
+		
+		gmaps.event.addListener(stopMarker, 'click', showStopInfoWindow.bind(stopMarker));
+		
+  		this.stopMarkes.push(stopMarker);
 	},
 	
 	removeStopMarkers: function (){
