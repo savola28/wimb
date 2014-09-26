@@ -47,7 +47,7 @@ module.exports = React.createClass({
 					<span className={iconClassName} title={title} data-stop-code={stop.code} onClick={this.toggleCollapse}></span> {stop.code} {stop.name}
 				</div>
 				<div className={contentClassName}>
-					<StopTimetable stop={stop} />
+					<StopTimetable stop={stop} renderOneDeparturePerLine={true} />
 				</div>
 			</div>
 		);
