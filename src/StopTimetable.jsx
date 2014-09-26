@@ -13,12 +13,6 @@ module.exports = React.createClass({
 		};
 	},
 	
-	componentDidUpdate: function (){
-		if (this.props.onDeparturesRendered){
-			this.props.onDeparturesRendered();
-		}
-	},
-	
 	componentDidMount: function() {
 		if (!this.state.departures-length){
 			return;
@@ -85,7 +79,7 @@ module.exports = React.createClass({
 			destination = startEnd[line.direction - 1],
 			departures;
 		
-		if (this.props.renderOnlyOneDepartures){
+		if (this.props.renderOneDeparturePerLine){
 			departures = this.renderDeparture(line.departures[0]);
 		}
 		else{
