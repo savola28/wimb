@@ -13,6 +13,10 @@ body {
 	height: 100%
 }
 
+.main-view {
+    margin-top: 15px;
+}
+
 .map-canvas {
 	height: 100%
 }

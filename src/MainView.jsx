@@ -3,7 +3,7 @@ var FavoriteStops = require('./FavoriteStops.jsx');
 
 module.exports = React.createClass({
 	render: function() {
-		var className = 'container-fluid';
+		var className = 'main-view container-fluid';
 		
 		if (this.props.activeView !== 'home'){
 			className += ' hidden';
