@@ -39,7 +39,6 @@ body {
 
 .map-infowindow-stop {
     max-height: 200px;
-    overflow-y: scroll;
     overflow-x: hidden;
 }
 
