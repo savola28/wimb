@@ -79,17 +79,10 @@ module.exports = React.createClass({
 			destination = startEnd[line.direction - 1],
 			departures;
 		
-		if (this.props.renderOneDeparturePerLine){
-			departures = this.renderDeparture(line.departures[0]);
-		}
-		else{
-			departures = line.departures.map(this.renderDeparture);
-		}
-		
 		return (
 			<tr key={index}>
 				<th>{line.code} &rarr; {destination}</th>
-				{departures}
+				{line.departures.map(this.renderDeparture)}
 			</tr>
 		);
 	},
@@ -109,7 +102,9 @@ module.exports = React.createClass({
 			hoursAndMinutes.push(minutes + 'min');
 		}
 
-		return (<td key={index} title={time}>{hoursAndMinutes.join(' ')}</td>);
+		var className = (index > 0) ? 'hidden-xs': '';
+
+		return (<td key={index} className={className} title={time}>{hoursAndMinutes.join(' ')}</td>);
 	},
 	
 	toggleFavoriteStop: function (){
