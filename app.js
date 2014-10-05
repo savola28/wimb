@@ -11,7 +11,7 @@ app.get('/vm', function(proxyReq, proxyRes){
 });
 
 app.get('/api', function(proxyReq, proxyRes){
-    proxyGet('http://api.publictransport.tampere.fi/prod/?user=its_factory_temp&pass=ITS4devN', proxyReq, proxyRes);
+    proxyGet('http://api.publictransport.tampere.fi/1_0_3/?user=its_factory_temp&pass=ITS4devN', proxyReq, proxyRes);
 });
 
 http.createServer(app).listen(process.env.PORT);
