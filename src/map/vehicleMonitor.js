@@ -1,4 +1,5 @@
 var gmaps = google.maps,
+	React = require('react'),
 	VehicleMarker = require('./VehicleMarker.js'),
 	StopTimetable = require('../StopTimetable.jsx'),
 	LineControl = require('./LineControl.jsx');

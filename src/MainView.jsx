@@ -1,4 +1,5 @@
-var FavoriteStops = require('./FavoriteStops.jsx');
+var React = require('react'),
+	FavoriteStops = require('./FavoriteStops.jsx');
 
 module.exports = React.createClass({
 	render: function() {

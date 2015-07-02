@@ -1,4 +1,5 @@
-var Menu = require('./Menu.jsx'),
+var React = require('react'),
+	Menu = require('./Menu.jsx'),
 	MainView = require('./MainView.jsx'),
 	MapComponent = require('./Map.jsx');
 

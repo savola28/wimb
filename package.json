@@ -14,12 +14,13 @@
         "gulp-if": "*",
         "gulp-jshint": "*",
         "gulp-uglify": "*",
-        "react-tools": "*",
+        "react": "0.13.*",
         "vinyl-buffer": "*",
-        "vinyl-source-stream": "*"
+        "vinyl-source-stream": "*",
+        "watchify": "*"
     },
     "scripts": {
-        "postinstall": "./node_modules/gulp-cli/bin/gulp.js build --production",
+        "postinstall": "./node_modules/gulp-cli/bin/gulp.js deploy",
         "start": "node app.js"
     }
 }

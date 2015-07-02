@@ -1,4 +1,5 @@
-var favoriteStorage = require('../favoriteStorage.js');
+var React = require('react'),
+	favoriteStorage = require('../favoriteStorage.js');
 
 module.exports =  React.createClass({
 	getInitialState: function() {

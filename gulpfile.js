@@ -11,8 +11,7 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
-
-var enviroment = process.argv[3] === '--production' ? 'production' : 'development';
+var watchify = require('watchify');
 
 gulp.task('jshint', function() {
 	gulp.src('src/**/*')
@@ -22,18 +21,41 @@ gulp.task('jshint', function() {
 		.pipe(jshint.reporter('fail'));
 });
 
-gulp.task('build', ['jshint'], function() {
-	browserify('src/entry.js')
-		.transform(babelify)
-		.bundle()
-		.pipe(source('bundle.js'))
-		.pipe(buffer())
-		.pipe(gulpif(enviroment === 'production', uglify()))
-		.pipe(gulp.dest('static'));
+gulp.task('deploy', ['jshint'], function() {
+	build('production');
 });
 
-gulp.task('watch', function() {
-	gulp.watch('src/**/*', ['build']);
+gulp.task('develop', ['jshint'], function() {
+	build('development');
 });
 
-gulp.task('default', ['build', 'watch']);
+function build(env) {
+	var bundler = browserify({
+		entries: ['src/entry.js'],
+		transform: [babelify], // We want to convert JSX to normal javascript
+		cache: {},
+		packageCache: {},
+		fullPaths: true // Requirement of watchify
+	});
+
+	if (env === 'development') {
+		bundler = watchify(bundler);
+		bundler.on('update', function() {
+			var updateStart = Date.now();
+			bundle(bundler, env);
+			console.log('Build in ', (Date.now() - updateStart) + 'ms');
+		});
+	}
+
+	bundle(bundler, env);
+
+	function bundle(bundler, env) {
+		bundler.bundle()
+			.pipe(source('bundle.js'))
+			.pipe(buffer())
+			.pipe(gulpif(env === 'production', uglify()))
+			.pipe(gulp.dest('static'));
+	}
+}
+
+gulp.task('default', ['develop']);

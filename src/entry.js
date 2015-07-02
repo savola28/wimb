@@ -1,4 +1,5 @@
-var App = require('./App.jsx'),
+var React = require('react'),
+    App = require('./App.jsx'),
     position = null;
 
 window.onhashchange = renderWithoutPosition;

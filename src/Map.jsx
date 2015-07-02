@@ -1,4 +1,5 @@
 var gmaps = google.maps,
+	React = require('react'),
 	vehicleMonitor = require('./map/vehicleMonitor.js');
 
 module.exports = React.createClass({

@@ -1,3 +1,5 @@
+var React = require('react');
+
 var views = ['home', 'map'];
 
 module.exports = React.createClass({

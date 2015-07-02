@@ -89,7 +89,6 @@
 
 	// Custom Globals
 	"globals": {
-		"React": false,
 		"google": false,
 		"GeolocationMarker": false,
 		"moment": false
