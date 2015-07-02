@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var favoriteStorage = require('../favoriteStorage.js');
 
 module.exports =  React.createClass({

@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var gmaps = google.maps,
 	vehicleMonitor = require('./map/vehicleMonitor.js');
 

@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var FavoriteStops = require('./FavoriteStops.jsx');
 
 module.exports = React.createClass({

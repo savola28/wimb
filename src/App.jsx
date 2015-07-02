@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var Menu = require('./Menu.jsx'),
 	MainView = require('./MainView.jsx'),
 	MapComponent = require('./Map.jsx');

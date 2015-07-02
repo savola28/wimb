@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var views = ['home', 'map'];
 
 module.exports = React.createClass({
