@@ -155,7 +155,7 @@ module.exports = {
 				infoWindow: null
 			});
 		
-		gmaps.event.addListener(stopMarker, 'click', showStopInfoWindow.bind(stopMarker));
+		gmaps.event.addListener(stopMarker, 'click', showStopInfoWindow.bind(null, stopMarker));
 		
   		this.stopMarkes.push(stopMarker);
 	},
@@ -168,32 +168,33 @@ module.exports = {
 	}
 };
 
-function showStopInfoWindow(){
-	if (!this.infoWindow){
-		this.infoWindow = new gmaps.InfoWindow();
+function showStopInfoWindow(stopMarker){
+	if (!stopMarker.infoWindow){
+		stopMarker.infoWindow = new gmaps.InfoWindow();
 	}
 	
-	this.infoWindow.setContent('Loading...');
+	stopMarker.infoWindow.setContent('Loading...');
 	
-	this.infoWindow.open(this.getMap(), this);
+	stopMarker.infoWindow.open(stopMarker.getMap(), stopMarker);
 	
 	$.getJSON('api', {
 		request: 'stop',
-		code: this.stop.code,
+		code: stopMarker.stop.code,
 		dep_limit: 20,
 		time_limit: 360
-	}, showStopInfoWindowContent.bind(this));
+	}, function (stops) {
+		showStopInfoWindowContent(stopMarker, stops);	
+	});
 }
 
-function showStopInfoWindowContent(stops){
-	
+function showStopInfoWindowContent(stopMarker, stops) {
 	var containerNode = document.createElement('div');
 	containerNode.className = 'map-infowindow-stop';
 	
-	this.infoWindow.setContent(containerNode);
+	stopMarker.infoWindow.setContent(containerNode);
 	
-	React.renderComponent(StopTimetable({
-		stop: this.stop,
+	React.renderComponent(new StopTimetable({
+		stop: stopMarker.stop,
 		departures: stops[0].departures,
 		enableFavoriteToggler: true
 	}), containerNode);

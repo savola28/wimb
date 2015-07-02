@@ -33,7 +33,7 @@ module.exports = React.createClass({
 		return (<li key={viewId} className={isActive ? 'active' : ''}><a href={'#'+viewId} onClick={this.handleMenuClick}>{viewId}</a></li>);		
 	},
 	
-	handleMenuClick: function (event){
+	handleMenuClick: function (){
 		$('.navbar-collapse', this.getDOMNode()).collapse('hide');
 	}
 });

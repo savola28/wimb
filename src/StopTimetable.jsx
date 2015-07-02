@@ -13,23 +13,17 @@ module.exports = React.createClass({
 	},
 	
 	componentDidMount: function() {
-		if (!this.state.departures-length){
-			return;
-		}
-		
 		$.getJSON('api', {
 			request: 'stop',
 			code: this.props.stop.code,
 			dep_limit: 20,
 			time_limit: 360
-		}, handleJSON.bind(this));
-		
-		function handleJSON(stops){
+		}, function (stops) {
 			this.setState({
 				isFavorite: this.state.isFavorite,
 				departures: stops[0].departures
-			});			
-		}
+			});
+		}.bind(this));
 	},
 	
 	render: function() {
@@ -75,8 +69,7 @@ module.exports = React.createClass({
 	
 	renderLine: function (line, index) {
 		var startEnd = line.route.split(' - '),
-			destination = startEnd[line.direction - 1],
-			departures;
+			destination = startEnd[line.direction - 1];
 		
 		return (
 			<tr key={index}>
