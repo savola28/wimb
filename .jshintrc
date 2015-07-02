@@ -90,8 +90,7 @@
 	// Custom Globals
 	"globals": {
 		"google": false,
-		"GeolocationMarker": false,
-		"moment": false
+		"GeolocationMarker": false
 
 	} // additional predefined global variables
 }
