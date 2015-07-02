@@ -1,4 +1,5 @@
 var React = require('react'),
+	moment = require('moment'),
 	favoriteStorage = require('./favoriteStorage.js'),
 	locale = 'fi',
 	timeOptions = {hour: 'numeric', minute: 'numeric'};

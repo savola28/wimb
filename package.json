@@ -14,6 +14,7 @@
         "gulp-if": "*",
         "gulp-jshint": "*",
         "gulp-uglify": "*",
+        "moment": "2.10.*",
         "react": "0.13.*",
         "vinyl-buffer": "*",
         "vinyl-source-stream": "*",
