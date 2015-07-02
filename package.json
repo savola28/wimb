@@ -4,20 +4,22 @@
     "author": "Seppo Savolainen <seppo.k.savolainen@gmail.com>",
     "description": "WIMB (where is my bus) tells you from where and when your next bus leaves and where it is right now",
     "private": true,
-    "dependencies" : {
-        "express"               : "*",
-        "grunt"                 : "*",
-        "grunt-cli"             : "*",
-        "grunt-contrib-watch"   : "*",
-        "grunt-react"           : "*",
-        "grunt-browserify"      : "*",
-        "grunt-contrib-uglify"  : "*",
-        "grunt-contrib-jshint"  : "*",
-        "grunt-jsxhint"         : "*",
-        "react-tools"           : "*"
+    "dependencies": {
+        "babelify": "*",
+        "browserify": "*",
+        "express": "*",
+        "gulp": "*",
+        "gulp-babel": "*",
+        "gulp-cli": "*",
+        "gulp-if": "*",
+        "gulp-jshint": "*",
+        "gulp-uglify": "*",
+        "react-tools": "*",
+        "vinyl-buffer": "*",
+        "vinyl-source-stream": "*"
     },
     "scripts": {
-        "postinstall": "./node_modules/grunt-cli/bin/grunt",
+        "postinstall": "./node_modules/gulp-cli/bin/gulp.js build --production",
         "start": "node app.js"
     }
 }
