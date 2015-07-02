@@ -24,8 +24,10 @@ function renderApp(newPosition){
         position = newPosition;
     }
     
-    React.renderComponent(App({
+    var app = React.createElement(App, {
         activeView: activeView,
         position: position
-    }), document.body);
+    });
+    
+    React.render(app, document.body);
 }

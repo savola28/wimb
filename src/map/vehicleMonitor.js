@@ -133,10 +133,12 @@ module.exports = {
 			}
 		}
 		
-		React.renderComponent(LineControl({
+		var lineControl = React.createElement(LineControl, {
 			lineCode: lines[0].code_short,
 			closeHandler: this.toggleTrackLine.bind(this)
-		}), this.map.lineControlNode);
+		});
+		
+		React.render(lineControl, this.map.lineControlNode);
 	},
 	
 	createStopMarker: function (stop){
@@ -193,9 +195,11 @@ function showStopInfoWindowContent(stopMarker, stops) {
 	
 	stopMarker.infoWindow.setContent(containerNode);
 	
-	React.renderComponent(new StopTimetable({
+	var stopTimetable = React.createElement(StopTimetable, {
 		stop: stopMarker.stop,
 		departures: stops[0].departures,
 		enableFavoriteToggler: true
-	}), containerNode);
+	});
+	
+	React.render(stopTimetable, containerNode);
 }
