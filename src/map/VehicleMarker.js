@@ -1,4 +1,4 @@
-var gmaps = google.maps;
+var gmaps = window.google.maps;
 
 VehicleMarker.prototype = new gmaps.OverlayView();
 

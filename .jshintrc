@@ -86,11 +86,5 @@
 	"worker": false, // Web Workers
 	"wsh": false, // Windows Scripting Host
 	"yui": false, // Yahoo User Interface
-
-	// Custom Globals
-	"globals": {
-		"google": false,
-		"GeolocationMarker": false
-
-	} // additional predefined global variables
+	"globals": {} // Custom Globals
 }

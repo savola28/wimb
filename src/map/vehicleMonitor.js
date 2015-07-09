@@ -1,4 +1,4 @@
-var gmaps = google.maps,
+var gmaps = window.google.maps,
 	React = require('react'),
 	VehicleMarker = require('./VehicleMarker.js'),
 	StopTimetable = require('../StopTimetable.jsx'),
@@ -207,7 +207,7 @@ function createMap(mapNode, coordinates) {
 	map.lineControlNode = document.createElement('div');
 	map.controls[gmaps.ControlPosition.TOP_LEFT].push(map.lineControlNode);
 
-	var positionMarker = new GeolocationMarker(map);
+	var positionMarker = new window.GeolocationMarker(map);
 	
 	var button = $('<button class="btn btn-default">My location</button>').click(function() {
 		map.setCenter(positionMarker.getPosition());
