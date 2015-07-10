@@ -15,7 +15,7 @@ function VehicleMarker(args) {
 VehicleMarker.prototype.onAdd = function() {
 	this._element = $('<div class="bus-marker">'+this._monitoredVehicleJourney.LineRef.value+'</div>');
 
-	this._element.click({monitoredVehicleJourney: this._monitoredVehicleJourney}, this._clickHandler);
+	this._element.click(this._clickHandler);
 
 	var panes = this.getPanes();
 	panes.overlayMouseTarget.appendChild(this._element[0]);

@@ -79,7 +79,7 @@ module.exports = {
 					map: this.map,
 					monitoredVehicleJourney: monitoredVehicleJourney,
 					position: position,
-					clickHandler: this.toggleTrackLine.bind(this)
+					clickHandler: this.toggleTrackLine.bind(this, monitoredVehicleJourney.LineRef.value)
 				});
 			}
 			newVehicles[vehicleRef] = vehicleMarker;
@@ -92,14 +92,13 @@ module.exports = {
 		setTimeout(this.fetchVehicleData.bind(this), 500);
 	},
 	
-	toggleTrackLine: function (event){
+	toggleTrackLine: function (lineRef){
 		if (this.trackedLineRef){
 			React.unmountComponentAtNode(this.map.lineControlNode);
 			this.trackedLineRef = '';
 			this.removeStopMarkers();
 		}
 		else{
-			var lineRef = event.data.monitoredVehicleJourney.LineRef.value;
 			this.trackedLineRef = lineRef;
 			this.fetchLine(lineRef);
 		}
