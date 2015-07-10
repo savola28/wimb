@@ -41,6 +41,11 @@ module.exports = {
 	},
 	
 	updateVehicles: function (data){
+		if (!this.isMonitorOn){
+			removeVehicles(this.vehicles);
+			return;
+		}
+		
 		var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
 
 		if (!vehicles){
@@ -49,23 +54,25 @@ module.exports = {
 		}
 
 		var bounds = this.map.getBounds(),
+			oldVehicles = this.vehicles,
 			newVehicles = {};
 
 		for(var i = 0; i < vehicles.length; i++){
 			var monitoredVehicleJourney = vehicles[i].MonitoredVehicleJourney,
-			vehicleRef = monitoredVehicleJourney.VehicleRef.value,
 			coords = monitoredVehicleJourney.VehicleLocation,
 			position = new gmaps.LatLng(coords.Latitude, coords.Longitude),
-			destination = monitoredVehicleJourney.DestinationName.value,
-			vehicleMarker = this.vehicles[vehicleRef];
+			destination = monitoredVehicleJourney.DestinationName.value;
 
 			if (!destination || !bounds.contains(position)){
 				continue;
 			}
 
+			var vehicleRef = monitoredVehicleJourney.VehicleRef.value;
+			var vehicleMarker = oldVehicles[vehicleRef];
+
 			if (vehicleMarker){
 				vehicleMarker.setPosition(position);
-				delete this.vehicles[vehicleRef];
+				delete oldVehicles[vehicleRef];
 			}
 			else{
 				vehicleMarker = new VehicleMarker({
@@ -78,25 +85,11 @@ module.exports = {
 			newVehicles[vehicleRef] = vehicleMarker;
 		}
 
-		this.removeVehicles();
+		removeVehicles(oldVehicles);
 
 		this.vehicles = newVehicles;
 
-		if (this.isMonitorOn){
-			setTimeout(this.fetchVehicleData.bind(this), 500);
-		}
-		else{
-			this.removeVehicles();
-		}
-	},
-
-	removeVehicles: function (){
-		for(var i in this.vehicles){
-			if (this.vehicles.hasOwnProperty(i)){
-				this.vehicles[i].setMap(null);
-			}
-		}
-		this.vehicles = {};
+		setTimeout(this.fetchVehicleData.bind(this), 500);
 	},
 	
 	toggleTrackLine: function (event){
@@ -249,4 +242,13 @@ function showStopInfoWindowContent(stopMarker, stops) {
 	});
 	
 	React.render(stopTimetable, containerNode);
+}
+
+function removeVehicles(vehicles){
+	for(var i in vehicles){
+		if (vehicles.hasOwnProperty(i)){
+			vehicles[i].setMap(null);
+		}
+	}
+	vehicles = {};	
 }
