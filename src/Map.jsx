@@ -1,5 +1,5 @@
 var React = require('react'),
-	vehicleMonitor = require('./map/vehicleMonitor.js');
+	map = require('./map/map.js');
 
 module.exports = React.createClass({
 	render: function () {
@@ -24,10 +24,10 @@ module.exports = React.createClass({
 	
 	tryToActivate: function (){
 		if (this.props.activeView === 'map'){
-			vehicleMonitor.start(this.getDOMNode(), this.props.coordinates);
+			map.show(this.getDOMNode(), this.props.coordinates);
 		}
 		else {
-			vehicleMonitor.stop();
+			map.hide();
 		}
 	}
 });
