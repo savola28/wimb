@@ -44,7 +44,7 @@ module.exports = {
 		var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
 
 		if (!vehicles){
-			// TODO: errormessage:'No vehicle data available'
+			window.alert('No vehicle data available');
 			return;
 		}
 
