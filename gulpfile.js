@@ -29,6 +29,10 @@ gulp.task('develop', ['jshint'], function() {
 	build('development');
 });
 
+gulp.task('watch', ['jshint'], function() {
+	build('watch');
+});
+
 function build(env) {
 	var bundler = browserify({
 		entries: ['src/entry.js'],
@@ -38,7 +42,7 @@ function build(env) {
 		fullPaths: true // Requirement of watchify
 	});
 
-	if (env === 'development') {
+	if (env === 'watch') {
 		bundler = watchify(bundler);
 		bundler.on('update', function() {
 			var updateStart = Date.now();
