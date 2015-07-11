@@ -2,13 +2,19 @@ var React = require('react'),
 	favoriteStorage = require('../favoriteStorage.js');
 
 module.exports =  React.createClass({
-	getInitialState: function() {
-		return {isFavorite: favoriteStorage.exists('lines', this.props.lineCode)};
+	render: function() {
+		if (this.props.lineCode){
+			return this.renderLineButton();
+		}
+		
+		return (
+			<div className="alert alert-info" role="alert">Show line and stops by clicking a bus</div>
+		);
 	},
 	
-	render: function() {
+	renderLineButton: function (){
 		var iconClass = 'glyphicon glyphicon-star';
-		if (!this.state.isFavorite){
+		if (!favoriteStorage.exists('lines', this.props.lineCode)){
 			iconClass += '-empty';
 		}
 		
@@ -26,13 +32,12 @@ module.exports =  React.createClass({
 	},
 	
 	toggleFavoriteLine: function (){
-		if (this.state.isFavorite){
+		if (favoriteStorage.exists('lines', this.props.lineCode)){
 			favoriteStorage.remove('lines', this.props.lineCode);
-			this.setState({isFavorite: false});
 		}
 		else{
 			favoriteStorage.add('lines', this.props.lineCode);
-			this.setState({isFavorite: true});
 		}
+		this.forceUpdate();
 	}
 });

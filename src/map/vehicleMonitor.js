@@ -1,26 +1,23 @@
 var gmaps = window.google.maps,
 	React = require('react'),
 	VehicleMarker = require('./VehicleMarker.js'),
-	StopTimetable = require('../StopTimetable.jsx'),
-	LineControl = require('./LineControl.jsx');
+	LineControl = require('./LineControl.jsx'),
+	stopMarkers = require('./stopMarkers.js');
 
 module.exports = {
 	map: null,
+	
+	isMonitorOn: false,
 	
 	vehicles: {},
 	
 	trackedLineRef: '',
 	
-	linePolyline: null,
-	
-	lineControlNode: null,
-	
-	stopMarkes: [],
-	
-	isMonitorOn: false,
-	
 	start: function(map){
 		this.map = map;
+		
+		this.renderLineControl();
+		
 		this.isMonitorOn = true;
 		this.fetchVehicleData();
 	},
@@ -30,6 +27,11 @@ module.exports = {
 	},
 
 	fetchVehicleData: function (){
+		if (!this.isMonitorOn){
+			removeVehicles(this.vehicles);
+			return;
+		}
+		
 		var args = null;
 		if (this.trackedLineRef){
 			args = {lineRef: this.trackedLineRef};
@@ -39,11 +41,6 @@ module.exports = {
 	},
 	
 	updateVehicles: function (data){
-		if (!this.isMonitorOn){
-			removeVehicles(this.vehicles);
-			return;
-		}
-		
 		var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
 
 		if (!vehicles){
@@ -92,111 +89,26 @@ module.exports = {
 	
 	toggleTrackLine: function (lineRef){
 		if (this.trackedLineRef){
-			React.unmountComponentAtNode(this.map.lineControlNode);
 			this.trackedLineRef = '';
-			this.removeStopMarkers();
+			stopMarkers.remove();
 		}
 		else{
 			this.trackedLineRef = lineRef;
-			this.fetchLine(lineRef);
+			stopMarkers.create(this.map, this.trackedLineRef);
 		}
+		
+		this.renderLineControl();
 	},
 	
-	fetchLine: function (lineRef){
-		$(this.map.lineControlNode).append('<div class="alert alert-info" role="alert">Loading stops...</div>');
-		
-		$.getJSON('api', {
-			request: 'lines',
-			query: lineRef,
-			epsg_in: 'wgs84',
-			epsg_out: 'wgs84'
-		}, this.showLineStops.bind(this));
-	},
-
-	showLineStops: function (lines){
-		var renderedStops = {};
-		for(var i = 0; i < lines.length; i++){
-			var stops = lines[i].line_stops;
-			for(var j = 0; j < stops.length; j++){
-				var stop = stops[j];
-				if (renderedStops[stop.code]){
-					continue;
-				}
-				renderedStops[stop.code] = true;
-				this.createStopMarker(stop);
-			}
-		}
-		
+	renderLineControl: function (){
 		var lineControl = React.createElement(LineControl, {
-			lineCode: lines[0].code_short,
+			lineCode: this.trackedLineRef,
 			closeHandler: this.toggleTrackLine.bind(this)
 		});
-		
+	
 		React.render(lineControl, this.map.lineControlNode);
-	},
-	
-	createStopMarker: function (stop){
-		var coords = stop.coords.split(','),
-			longitude = coords[0],
-			latitude = coords[1],
-			position = new gmaps.LatLng(latitude, longitude),
-			stopMarker = new gmaps.Marker({
-				map: this.map,
-				position: position,
-				icon: {
-					path: gmaps.SymbolPath.CIRCLE,
-					scale: 3
-				},
-				stop: stop,
-				infoWindow: null
-			});
-		
-		gmaps.event.addListener(stopMarker, 'click', showStopInfoWindow.bind(null, stopMarker));
-		
-  		this.stopMarkes.push(stopMarker);
-	},
-	
-	removeStopMarkers: function (){
-		for(var i = 0; i < this.stopMarkes.length; i++){
-			this.stopMarkes[i].setMap(null);
-		}
-		this.lineStops = [];		
 	}
 };
-
-function showStopInfoWindow(stopMarker){
-	if (!stopMarker.infoWindow){
-		stopMarker.infoWindow = new gmaps.InfoWindow();
-	}
-	
-	stopMarker.infoWindow.setContent('Loading...');
-	
-	stopMarker.infoWindow.open(stopMarker.getMap(), stopMarker);
-	
-	$.getJSON('api', {
-		request: 'stop',
-		code: stopMarker.stop.code,
-		dep_limit: 20,
-		time_limit: 360
-	}, function (stops) {
-		showStopInfoWindowContent(stopMarker, stops);	
-	});
-}
-
-function showStopInfoWindowContent(stopMarker, stops) {
-	var containerNode = document.createElement('div');
-	containerNode.className = 'map-infowindow-stop';
-	
-	stopMarker.infoWindow.setContent(containerNode);
-	
-	var stopTimetable = React.createElement(StopTimetable, {
-		stop: stopMarker.stop,
-		departures: stops[0].departures,
-		enableFavoriteToggler: true
-	});
-	
-	React.render(stopTimetable, containerNode);
-}
 
 function removeVehicles(vehicles){
 	for(var i in vehicles){
