@@ -1,0 +1,1 @@
+wimb (where is my bus) tells you from where and when your next bus leaves and where it is right now in Tampere.
