@@ -24,7 +24,7 @@ module.exports = React.createClass({
 	
 	tryToActivate: function (){
 		if (this.props.activeView === 'map'){
-			map.show(this.getDOMNode(), this.props.coordinates);
+			map.show(this.getDOMNode());
 		}
 		else {
 			map.hide();
