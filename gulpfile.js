@@ -1,8 +1,7 @@
 var gulp = require('gulp');
 
-// jshint
-var babel = require("gulp-babel"); // jsx -> js for jshint
-var jshint = require('gulp-jshint');
+// eslint
+var eslint = require('gulp-eslint');
 
 // browserify
 var browserify = require('browserify');
@@ -13,23 +12,36 @@ var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
 var watchify = require('watchify');
 
-gulp.task('jshint', function() {
-	gulp.src('src/**/*')
-		.pipe(babel())
-		.pipe(jshint())
-		.pipe(jshint.reporter('default'))
-		.pipe(jshint.reporter('fail'));
+gulp.task('lint', function() {
+	return gulp.src(['gulpfile.js', 'src/**/*.js', 'src/**/*.jsx'])
+		.pipe(eslint({
+			baseConfig: {
+				ecmaFeatures: {
+					jsx: true
+				}
+			},
+			rules: {
+				semi: [2, 'always'],
+				quotes: [2, 'single', 'avoid-escape'],
+				camelcase: [2, {
+					'properties': 'never'
+				}]
+			},
+			envs: ['browser', 'node', 'jquery']
+		}))
+		.pipe(eslint.format())
+		.pipe(eslint.failOnError());
 });
 
-gulp.task('deploy', ['jshint'], function() {
+gulp.task('deploy', ['lint'], function() {
 	build('production');
 });
 
-gulp.task('develop', ['jshint'], function() {
+gulp.task('develop', ['lint'], function() {
 	build('development');
 });
 
-gulp.task('watch', ['jshint'], function() {
+gulp.task('watch', ['lint'], function() {
 	build('watch');
 });
 
