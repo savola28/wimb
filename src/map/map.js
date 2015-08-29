@@ -1,20 +1,5 @@
-var gmaps = window.google.maps,
-	vehicleMonitor = require('./vehicleMonitor.js');
-
-module.exports = {
-	map: null,
-	
-	show: function (mapNode, coordinates){
-		if (!this.map){
-			this.map = createMap(mapNode, coordinates);
-		}
-		vehicleMonitor.start(this.map);
-	},
-	
-	hide: function (){
-		vehicleMonitor.stop();
-	}
-};
+var gmaps = window.google.maps;
+var vehicleMonitor = require('./vehicleMonitor.js');
 
 function createMap(mapNode, coordinates) {
 	// default is central of Tampere
@@ -50,11 +35,26 @@ function createMap(mapNode, coordinates) {
 	map.controls[gmaps.ControlPosition.TOP_LEFT].push(map.lineControlNode);
 
 	var positionMarker = new window.GeolocationMarker(map);
-	
+
 	var button = $('<button class="btn btn-default">My location</button>').click(function() {
 		map.setCenter(positionMarker.getPosition());
 	});
 	map.controls[gmaps.ControlPosition.TOP_RIGHT].push(button[0]);
-	
+
 	return map;
 }
+
+module.exports = {
+	map: null,
+
+	show: function (mapNode, coordinates){
+		if (!this.map){
+			this.map = createMap(mapNode, coordinates);
+		}
+		vehicleMonitor.start(this.map);
+	},
+
+	hide: function (){
+		vehicleMonitor.stop();
+	}
+};

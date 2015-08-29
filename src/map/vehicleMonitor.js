@@ -1,23 +1,33 @@
-var gmaps = window.google.maps,
-	React = require('react'),
+var gmaps = window.google.maps;
+
+var React = require('react'),
 	VehicleMarker = require('./VehicleMarker.js'),
 	LineControl = require('./LineControl.jsx'),
 	stopMarkers = require('./stopMarkers.js');
 
+function removeVehicles(vehicles){
+	for(var i in vehicles){
+		if (vehicles.hasOwnProperty(i)){
+			vehicles[i].setMap(null);
+		}
+	}
+	vehicles = {};
+}
+
 module.exports = {
 	map: null,
-	
+
 	isMonitorOn: false,
-	
+
 	vehicles: {},
-	
+
 	trackedLineRef: '',
-	
+
 	start: function(map){
 		this.map = map;
-		
+
 		this.renderLineControl();
-		
+
 		this.isMonitorOn = true;
 		this.fetchVehicleData();
 	},
@@ -31,7 +41,7 @@ module.exports = {
 			removeVehicles(this.vehicles);
 			return;
 		}
-		
+
 		var args = null;
 		if (this.trackedLineRef){
 			args = {lineRef: this.trackedLineRef};
@@ -39,12 +49,12 @@ module.exports = {
 
 		$.getJSON('vm', args, this.updateVehicles.bind(this));
 	},
-	
+
 	updateVehicles: function (data){
 		var vehicles = data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity;
 
 		if (!vehicles){
-			window.alert('No vehicle data available');
+			// TODO: notify user
 			return;
 		}
 
@@ -86,7 +96,7 @@ module.exports = {
 
 		setTimeout(this.fetchVehicleData.bind(this), 500);
 	},
-	
+
 	toggleTrackLine: function (lineRef){
 		if (this.trackedLineRef){
 			this.trackedLineRef = '';
@@ -96,25 +106,16 @@ module.exports = {
 			this.trackedLineRef = lineRef;
 			stopMarkers.create(this.map, this.trackedLineRef);
 		}
-		
+
 		this.renderLineControl();
 	},
-	
+
 	renderLineControl: function (){
 		var lineControl = React.createElement(LineControl, {
 			lineCode: this.trackedLineRef,
 			closeHandler: this.toggleTrackLine.bind(this)
 		});
-	
+
 		React.render(lineControl, this.map.lineControlNode);
 	}
 };
-
-function removeVehicles(vehicles){
-	for(var i in vehicles){
-		if (vehicles.hasOwnProperty(i)){
-			vehicles[i].setMap(null);
-		}
-	}
-	vehicles = {};	
-}

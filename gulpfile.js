@@ -5,7 +5,7 @@ var eslint = require('gulp-eslint');
 
 // browserify
 var browserify = require('browserify');
-var babelify = require("babelify"); // jsx -> js for browserify
+var babelify = require('babelify'); // jsx -> js for browserify
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var gulpif = require('gulp-if');

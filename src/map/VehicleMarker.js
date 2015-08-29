@@ -1,53 +1,55 @@
+'use strict';
+
 var gmaps = window.google.maps;
+
+function VehicleMarker(args) {
+	this.map = args.map;
+	this.monitoredVehicleJourney = args.monitoredVehicleJourney;
+	this.position = args.position;
+	this.clickHandler = args.clickHandler;
+	this.element = null;
+
+	this.setMap(this.map);
+}
 
 VehicleMarker.prototype = new gmaps.OverlayView();
 
-function VehicleMarker(args) {
-	this._map = args.map;
-	this._monitoredVehicleJourney = args.monitoredVehicleJourney;
-	this._position = args.position;
-	this._clickHandler = args.clickHandler;
-	this._element = null;
-
-	this.setMap(this._map);
-}
-
 VehicleMarker.prototype.onAdd = function() {
-	this._element = $('<div class="bus-marker">'+this._monitoredVehicleJourney.LineRef.value+'</div>');
+	this.element = $('<div class="bus-marker">' + this.monitoredVehicleJourney.LineRef.value + '</div>');
 
-	this._element.click(this._clickHandler);
+	this.element.click(this.clickHandler);
 
 	var panes = this.getPanes();
-	panes.overlayMouseTarget.appendChild(this._element[0]);
+	panes.overlayMouseTarget.appendChild(this.element[0]);
 };
 
 VehicleMarker.prototype.draw = function() {
-	this.setPosition(this._position);
+	this.setPosition(this.position);
 };
 
 VehicleMarker.prototype.onRemove = function() {
-	this._element.remove();
-	this._element = null;
+	this.element.remove();
+	this.element = null;
 };
 
 VehicleMarker.prototype.setPosition = function(position) {
-	if (!this._element){
+	if (!this.element){
 		return;
 	}
 
-	this._position = position;
+	this.position = position;
 	var overlayProjection = this.getProjection();
 	var pixelPosition = overlayProjection.fromLatLngToDivPixel(position),
 	left = (pixelPosition.x - 12.5) + 'px',
 	top = (pixelPosition.y - 10) + 'px';
 
-	this._element.css('left', left).css('top', top);
+	this.element.css('left', left).css('top', top);
 };
 
-VehicleMarker.prototype._getTooltipHTML = function() {
+VehicleMarker.prototype.getTooltipHTML = function() {
 	var content = '',
-	origin = this._monitoredVehicleJourney.OriginName.value,
-	destination = this._monitoredVehicleJourney.DestinationName.value;
+	origin = this.monitoredVehicleJourney.OriginName.value,
+	destination = this.monitoredVehicleJourney.DestinationName.value;
 
 	if (origin !== '' && destination !== ''){
 		content = origin + '&nbsp;&rarr;&nbsp;' + destination;
