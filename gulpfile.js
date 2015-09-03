@@ -13,7 +13,7 @@ var uglify = require('gulp-uglify');
 var watchify = require('watchify');
 
 gulp.task('lint', function() {
-	return gulp.src(['gulpfile.js', 'src/**/*.js', 'src/**/*.jsx'])
+	return gulp.src(['app.js', 'gulpfile.js', 'src/**/*.js', 'src/**/*.jsx'])
 		.pipe(eslint({
 			baseConfig: {
 				ecmaFeatures: {
